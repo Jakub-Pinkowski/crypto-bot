@@ -173,10 +173,4 @@ if __name__ == "__main__":
     potential_coins = filter_potential_coins(all_symbols_data)
 
     # Fetch coins data
-    start_time = time.time()  # Record start time
     coins_data = fetch_coins_data(all_symbols_data, potential_coins)
-    end_time = time.time()  # Record end time
-
-    # Calculate total execution time
-    execution_time = end_time - start_time
-    print(f"Time taken to fetch coins_data: {execution_time:.2f} seconds")
