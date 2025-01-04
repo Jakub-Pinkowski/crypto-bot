@@ -80,16 +80,28 @@ def filter_potential_coins(all_symbols_data):
 
 def fetch_coins_data(all_symbols_data, potential_coins):
     """
-    Fetches data for each coin in the potential_coins set.
-
+    Fetches data for each coin in the potential_coins set, including:
+    - Active trading pairings for each coin
+    - Order book data for active trading pairs
+    - Recent trades for each active trading pair
+    - Candlestick data (last 24 hours with 1-hour intervals)
+    - Aggregated trades for each active trading pair
 
     Parameters:
+        all_symbols_data (dict): Dictionary containing exchange information and active symbols.
         potential_coins (set): Set of potential coins to fetch data for.
-        
+
     Returns:
+        dict: A dictionary containing detailed data for each coin.
+              Each coin is mapped to its trading data, including:
+              - "pairings": List of active trading pairs for the coin.
+              - "order_books": Order book data for all active trading pairs.
+              - "recent_trades": Recent trades information for each trading pair.
+              - "candlesticks": Last 24 candlesticks (1-hour interval) for each pair.
+              - "aggregated_trades": Aggregated trade data for each pair.
     """
 
-    coin_data = {}
+    coins_data = {}
 
     # Fetch trading symbols
     symbols = all_symbols_data["exchange_info"]["symbols"]
@@ -120,7 +132,7 @@ def fetch_coins_data(all_symbols_data, potential_coins):
             aggregated_trades[pair] = client.agg_trades(symbol=pair, limit=10)
 
         # Store everything in the coin data
-        coin_data[coin] = {
+        coins_data[coin] = {
             "pairings": trading_pairs,
             "order_books": order_books,
             "recent_trades": recent_trades,
@@ -128,8 +140,7 @@ def fetch_coins_data(all_symbols_data, potential_coins):
             "aggregated_trades": aggregated_trades,
         }
 
-    return coin_data
-
+    return coins_data
 
 
 if __name__ == "__main__":
