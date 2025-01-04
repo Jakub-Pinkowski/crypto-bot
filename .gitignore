@@ -1,14 +1,22 @@
-# Byte-compiled / optimized / compiled files
+# Python byte-compiled files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Django stuff:
+# Logs
 *.log
-*.pot
-*.pyc
+logs/
 
-# Unit test / coverage reports
+# Config files
+config/secrets.yaml
+config/*.yaml
+
+# Data files
+data/logs/
+data/market_data/
+*.sqlite3
+
+# Testing/coverage results
 htmlcov/
 .tox/
 .nox/
@@ -17,15 +25,19 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
-*.sqlite3
 
-# Mypy
+# Type-checking and linting
 .mypy_cache/
+.pyre/
+.pytype/
 
 # PyCharm specific files
 .idea/
 
-# Virtual environment
+# Virtual environments
 venv/
 env/
 ENV/
+
+# DS_Store for macOS
+.DS_Store
