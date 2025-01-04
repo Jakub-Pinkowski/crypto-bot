@@ -1,3 +1,4 @@
+import time
 from binance_auth import client
 
 def fetch_all_symbols_data():
@@ -134,16 +135,16 @@ def fetch_coins_data(all_symbols_data, potential_coins):
         # Collect data for each pairing
         for pair in trading_pairs:
             # Order book
-            order_books[pair] = client.depth(symbol=pair, limit=10)
+            order_books[pair] = client.depth(symbol=pair, limit=100)
 
             # Recent trades
-            recent_trades[pair] = client.trades(symbol=pair, limit=10)
+            recent_trades[pair] = client.trades(symbol=pair, limit=100)
 
             # Candlestick data (last 24 1-hour candles)
             candlestick_data[pair] = client.klines(symbol=pair, interval='1h', limit=24)
 
             # Aggregated trades
-            aggregated_trades[pair] = client.agg_trades(symbol=pair, limit=10)
+            aggregated_trades[pair] = client.agg_trades(symbol=pair, limit=100)
 
         # Store everything in the coin data
         coins_data[coin] = {
@@ -172,5 +173,10 @@ if __name__ == "__main__":
     potential_coins = filter_potential_coins(all_symbols_data)
 
     # Fetch coins data
+    start_time = time.time()  # Record start time
     coins_data = fetch_coins_data(all_symbols_data, potential_coins)
-    print(f"coins_data: {coins_data}")
+    end_time = time.time()  # Record end time
+
+    # Calculate total execution time
+    execution_time = end_time - start_time
+    print(f"Time taken to fetch coins_data: {execution_time:.2f} seconds")
