@@ -6,7 +6,9 @@ def fetch_all_symbols_data():
     - Exchange information (active symbols, metadata)
     - Current market prices
     - 24-hour market statistics
-    Returns a dictionary with the fetched data.
+
+    Returns:
+        dict: Dictionary containing exchange_info, active_symbols, prices, and stats.
     """
     # Fetch exchange information (metadata for symbols)
     exchange_info = client.exchange_info()
@@ -40,25 +42,25 @@ def filter_potential_coins(all_symbols_data):
         all_symbols_data (dict): Dictionary containing exchange_info, active_symbols, prices, and stats.
 
     Returns:
-        set: Set of unique assets (coins) from the filtered symbols.
+        set: Set of unique coins from the filtered symbols.
     """
 
     # Define filter thresholds
-    price_change_threshold = 5.0  # Minimum percentage price change (absolute)
-    price_range_volatility_threshold = 0.05  # Minimum range volatility in %
+    price_change_threshold = 10.0  # Minimum percentage price change (absolute)
+    price_range_volatility_threshold = 0.1  # Minimum range volatility in %
 
     # Extract relevant data from input
-    exchange_info = all_symbols_data["exchange_info"]["symbols"]
+    symbols = all_symbols_data["exchange_info"]["symbols"]
     active_symbols = all_symbols_data["active_symbols"]
     stats = all_symbols_data["stats"]
 
-    # Map symbols to their respective base and quote assets using exchange_info
+    # Map symbols to their respective base and quote assets using symbols
     symbol_mapping = {
         symbol_data['symbol']: {
             'baseAsset': symbol_data['baseAsset'],
             'quoteAsset': symbol_data['quoteAsset']
         }
-        for symbol_data in exchange_info
+        for symbol_data in symbols
     }
 
     # Filter symbols based on criteria
@@ -71,19 +73,72 @@ def filter_potential_coins(all_symbols_data):
             stat['lowPrice']) > price_range_volatility_threshold
     ]
 
-    # Extract unique base assets using the mapping from Step 1
+    # Extract unique coins from the symbols
     potential_coins = {symbol_mapping[symbol]['baseAsset'] for symbol in filtered_symbols}
 
     return potential_coins
 
+def fetch_coins_data(all_symbols_data, potential_coins):
+    """
+    Fetches data for each coin in the potential_coins set.
+
+
+    Parameters:
+        potential_coins (set): Set of potential coins to fetch data for.
+        
+    Returns:
+    """
+
+    coin_data = {}
+
+    # Fetch trading symbols
+    symbols = all_symbols_data["exchange_info"]["symbols"]
+    active_symbols = all_symbols_data["active_symbols"]
+
+    for coin in potential_coins:
+        pairings = [symbol for symbol in symbols if symbol['baseAsset'] == coin or symbol['quoteAsset'] == coin]
+        trading_pairs = [pair['symbol'] for pair in pairings if pair['symbol'] in active_symbols]
+
+        # Initialize data collectors
+        order_books = {}
+        recent_trades = {}
+        candlestick_data = {}
+        aggregated_trades = {}
+
+        # Collect data for each pairing
+        for pair in trading_pairs:
+            # Order book
+            order_books[pair] = client.depth(symbol=pair, limit=10)
+
+            # Recent trades
+            recent_trades[pair] = client.trades(symbol=pair, limit=10)
+
+            # Candlestick data (last 24 1-hour candles)
+            candlestick_data[pair] = client.klines(symbol=pair, interval='1h', limit=24)
+
+            # Aggregated trades
+            aggregated_trades[pair] = client.agg_trades(symbol=pair, limit=10)
+
+        # Store everything in the coin data
+        coin_data[coin] = {
+            "pairings": trading_pairs,
+            "order_books": order_books,
+            "recent_trades": recent_trades,
+            "candlesticks": candlestick_data,
+            "aggregated_trades": aggregated_trades,
+        }
+
+    return coin_data
+
+
 
 if __name__ == "__main__":
-    # Example usage
+    # Fetch data for all the symbols
     all_symbols_data = fetch_all_symbols_data()
 
-    # Step 1: Filter potential coins
+    # Filter potential coins
     potential_coins = filter_potential_coins(all_symbols_data)
 
-    # Step 2: Output list of unique assets
-    print("Unique Assets for Further Analysis:")
-    print(potential_coins)
+    # Fetch coins data
+    coins_data = fetch_coins_data(all_symbols_data, potential_coins)
+    print(f"coins_data: {coins_data}")
