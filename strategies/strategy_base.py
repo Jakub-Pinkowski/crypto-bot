@@ -19,6 +19,15 @@ class StrategyBase:
         :param coins_data: Dictionary containing all relevant data for coins.
         """
         self.coins_data = coins_data
+        
+    def extract_close_prices(self, coin):
+        candlestick_data = self.coins_data[coin].get("candlesticks", {})
+        close_prices = []
+        for pair, data_list in candlestick_data.items():
+            close_prices.extend([float(ohlcv[4]) for ohlcv in data_list])  # index 4 is the close price
+    
+        return close_prices
+        
 
     def apply_indicators(self):
         """
@@ -30,14 +39,9 @@ class StrategyBase:
 
         for coin, data in self.coins_data.items():
             try:
-                # Extract candlestick data (dictionary of trading pairs)
-                candlestick_data = data.get("candlesticks", {})
-
-                # Extract close prices from the relevant trading pair
-                close_prices = []
-                for pair, data_list in candlestick_data.items():
-                    close_prices.extend([float(ohlcv[4]) for ohlcv in data_list])  # index 4 is the close price
-
+                # Extract close prices using the new method
+                close_prices = self.extract_close_prices(coin)
+                
                 # Validate there are enough prices for indicator calculation
                 if len(close_prices) < 2:
                     print(f"Not enough close prices for {coin}, skipping...")
