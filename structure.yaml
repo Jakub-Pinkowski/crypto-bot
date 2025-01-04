@@ -1,0 +1,28 @@
+crypto_bot/
+├── config/
+│   ├── config.yaml          # General bot configurations (e.g., API details, trading pairs)
+│   ├── secrets.yaml         # Sensitive data like API keys (secured)
+├── data/
+│   ├── logs/                # Logs generated during runtime
+│   ├── market_data/         # Raw market data for analysis (if needed)
+├── strategies/
+│   ├── __init__.py          # Makes the folder a Python package
+│   ├── strategy_base.py     # Base class for strategies
+│   ├── moving_average.py    # Example strategy (e.g., moving average crossover)
+│   ├── rsi_strategy.py      # Another strategy (e.g., RSI indicator)
+├── services/
+│   ├── __init__.py          
+│   ├── data_fetcher.py      # Fetch market data from exchanges
+│   ├── order_executor.py    # Buy/sell orders handling
+│   ├── portfolio_manager.py # Track portfolio (e.g., balances, PnL)
+├── tests/
+│   ├── test_strategies.py   # Unit tests for strategies
+│   ├── test_services.py     # Unit tests for services
+├── utils/
+│   ├── __init__.py          
+│   ├── logger.py            # Logging utility
+│   ├── data_processing.py   # Helper functions for data manipulation or transformations
+├── main.py                  # Entry point for the bot
+├── requirements.txt         # Python package dependencies
+├── .gitignore               # Ignore secrets, logs, etc., for Git
+└── README.md                # Project documentation
