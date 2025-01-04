@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+*.cover
+.cache
+nosetests.xml
+coverage.xml
+*.sqlite3
+
+# Mypy
+.mypy_cache/
+
+# PyCharm specific files
+.idea/
+
+# Virtual environment
+venv/
+env/
+ENV/
