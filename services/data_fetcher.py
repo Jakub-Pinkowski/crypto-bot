@@ -28,9 +28,6 @@ def fetch_all_symbols_data():
         "stats": trading_stats,  # Filtered 24-hour stats
     }
 
-
 if __name__ == "__main__":
     # Fetch all general symbol data
     all_symbols_data = fetch_all_symbols_data()
-
-    print(all_symbols_data)
