@@ -1,7 +1,35 @@
 import json
 import os
 from datetime import datetime
-from binance_auth import client
+from services.binance_auth import client
+
+def get_coins_data():
+    """
+    Main function to fetch and prepare coins data.
+    It performs the following steps:
+    1. Fetch general symbols data.
+    2. Filter for potential coins based on criteria.
+    3. Fetch market data for filtered coins.
+    4. Save the coins data to a file for later use.
+
+    Returns:
+        dict: A dictionary containing detailed data for all filtered coins.
+    """
+    # Step 1: Fetch general symbols data
+    all_symbols_data = fetch_all_symbols_data()
+
+    # Step 2: Filter for potential coins
+    potential_coins = filter_potential_coins(all_symbols_data)
+
+    # Step 3: Fetch detailed data for filtered coins
+    coins_data = fetch_coins_data(all_symbols_data, potential_coins)
+
+    # Step 4: Save coins data to a file
+    save_coins_data_to_file(coins_data)
+
+    # Return the coins data
+    return coins_data
+
 
 def fetch_all_symbols_data():
     """
@@ -193,16 +221,3 @@ def save_coins_data_to_file(coins_data, filename=None):
         json.dump(coins_data, file, indent=4)
 
     print(f"Coins data saved to {file_path}")
-
-if __name__ == "__main__":
-    # Fetch data for all the symbols
-    all_symbols_data = fetch_all_symbols_data()
-
-    # Filter potential coins
-    potential_coins = filter_potential_coins(all_symbols_data)
-
-    # Fetch coins data
-    coins_data = fetch_coins_data(all_symbols_data, potential_coins)
-
-    # Save coins data to a file
-    save_coins_data_to_file(coins_data)
