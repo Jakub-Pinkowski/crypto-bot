@@ -28,13 +28,11 @@ def fetch_all_symbols_data():
         "stats": trading_stats,  # Filtered 24-hour stats
     }
 
-def filter_potential_coins(all_symbols_data):
+def filter_potential_symbols(all_symbols_data):
     """
     Filters potential coins based on the following criteria:
     - Significant price change (high volatility): Abs(priceChangePercent) > price_change_threshold
-    - Moderate trading volume: min_quote_volume < quoteVolume < max_quote_volume
     - High price range volatility: (highPrice - lowPrice) / lowPrice > price_range_volatility_threshold
-    - Excludes popular coins like BTCUSDT and ETHUSDT
 
     Parameters:
         all_symbols_data (dict): Dictionary containing exchange_info, active_symbols, prices, and stats.
@@ -45,14 +43,14 @@ def filter_potential_coins(all_symbols_data):
 
     # Define filter thresholds
     price_change_threshold = 5.0  # Minimum percentage price change (absolute)
-    price_range_volatility_threshold = 0.10  # Minimum range volatility (15%)
+    price_range_volatility_threshold = 0.05  # Minimum range volatility in %
 
     # Extract relevant data from the input
     stats = all_symbols_data["stats"]
     active_symbols = all_symbols_data["active_symbols"]
 
     # Define filters
-    filtered_coins = {
+    filtered_symbols = {
         stat['symbol']: {
             "priceChangePercent": float(stat['priceChangePercent']),
             "quoteVolume": float(stat['quoteVolume']),
@@ -65,7 +63,7 @@ def filter_potential_coins(all_symbols_data):
             stat['lowPrice']) > price_range_volatility_threshold
     }
 
-    return filtered_coins
+    return filtered_symbols
 
 
 if __name__ == "__main__":
@@ -73,10 +71,10 @@ if __name__ == "__main__":
     all_symbols_data = fetch_all_symbols_data()
 
     # Filter potential coins
-    potential_coins = filter_potential_coins(all_symbols_data)
+    potential_symbols = filter_potential_symbols(all_symbols_data)
 
     # Example output
-    print("Potential Coins for Further Analysis:")
-    for symbol, data in potential_coins.items():
+    print("Potential Symbols for Further Analysis:")
+    for symbol, data in potential_symbols.items():
         print(f"{symbol} -> {data}")
 
