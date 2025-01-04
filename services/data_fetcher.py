@@ -28,53 +28,62 @@ def fetch_all_symbols_data():
         "stats": trading_stats,  # Filtered 24-hour stats
     }
 
-def filter_potential_symbols(all_symbols_data):
+def filter_potential_coins(all_symbols_data):
     """
-    Filters potential coins based on the following criteria:
+    Filters potential symbols based on the following criteria:
     - Significant price change (high volatility): Abs(priceChangePercent) > price_change_threshold
     - High price range volatility: (highPrice - lowPrice) / lowPrice > price_range_volatility_threshold
+
+    Then extracts a robust set of unique assets (coins) from the filtered symbols.
 
     Parameters:
         all_symbols_data (dict): Dictionary containing exchange_info, active_symbols, prices, and stats.
 
     Returns:
-        dict: Dictionary of filtered coins with relevant data.
+        set: Set of unique assets (coins) from the filtered symbols.
     """
 
     # Define filter thresholds
     price_change_threshold = 5.0  # Minimum percentage price change (absolute)
     price_range_volatility_threshold = 0.05  # Minimum range volatility in %
 
-    # Extract relevant data from the input
-    stats = all_symbols_data["stats"]
+    # Extract relevant data from input
+    exchange_info = all_symbols_data["exchange_info"]["symbols"]
     active_symbols = all_symbols_data["active_symbols"]
+    stats = all_symbols_data["stats"]
 
-    # Define filters
-    filtered_symbols = {
-        stat['symbol']: {
-            "priceChangePercent": float(stat['priceChangePercent']),
-            "quoteVolume": float(stat['quoteVolume']),
-            "priceRangeVolatility": (float(stat['highPrice']) - float(stat['lowPrice'])) / float(stat['lowPrice']),
+    # Map symbols to their respective base and quote assets using exchange_info
+    symbol_mapping = {
+        symbol_data['symbol']: {
+            'baseAsset': symbol_data['baseAsset'],
+            'quoteAsset': symbol_data['quoteAsset']
         }
+        for symbol_data in exchange_info
+    }
+
+    # Filter symbols based on criteria
+    filtered_symbols = [
+        stat['symbol']
         for stat in stats
         if stat['symbol'] in active_symbols and
            abs(float(stat['priceChangePercent'])) > price_change_threshold and
            (float(stat['highPrice']) - float(stat['lowPrice'])) / float(
             stat['lowPrice']) > price_range_volatility_threshold
-    }
+    ]
 
-    return filtered_symbols
+    # Extract unique base assets using the mapping from Step 1
+    potential_coins = {symbol_mapping[symbol]['baseAsset'] for symbol in filtered_symbols}
+
+    return potential_coins
 
 
 if __name__ == "__main__":
-    # Fetch all general symbol data
+    # Example usage
     all_symbols_data = fetch_all_symbols_data()
 
-    # Filter potential coins
-    potential_symbols = filter_potential_symbols(all_symbols_data)
+    # Step 1: Filter potential coins
+    potential_coins = filter_potential_coins(all_symbols_data)
 
-    # Example output
-    print("Potential Symbols for Further Analysis:")
-    for symbol, data in potential_symbols.items():
-        print(f"{symbol} -> {data}")
-
+    # Step 2: Output list of unique assets
+    print("Unique Assets for Further Analysis:")
+    print(potential_coins)
