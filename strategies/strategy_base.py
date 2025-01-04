@@ -1,5 +1,5 @@
 import pandas as pd
-
+from strategies.basic_indicators import calculate_sma, calculate_ema, calculate_rsi
 
 def calculate_indicators(coins_data):
     strategy = StrategyBase(coins_data)
@@ -19,52 +19,6 @@ class StrategyBase:
         :param coins_data: Dictionary containing all relevant data for coins.
         """
         self.coins_data = coins_data
-
-    def calculate_sma(self, prices, window=14):
-        """
-        Calculate Simple Moving Average (SMA).
-
-        :param prices: List or array of prices.
-        :param window: Number of periods for SMA calculation.
-        :return: SMA values as a pandas Series.
-        """
-        if not prices:
-            return None
-        prices_series = pd.Series(prices)
-        return prices_series.rolling(window=window).mean()
-
-    def calculate_ema(self, prices, window=14):
-        """
-        Calculate Exponential Moving Average (EMA).
-
-        :param prices: List or array of prices.
-        :param window: Number of periods for EMA calculation.
-        :return: EMA values as a pandas Series.
-        """
-        if not prices:
-            return None
-        prices_series = pd.Series(prices)
-        return prices_series.ewm(span=window, adjust=False).mean()
-
-    def calculate_rsi(self, prices, window=14):
-        """
-        Calculate Relative Strength Index (RSI).
-
-        :param prices: List or array of prices.
-        :param window: Number of periods for RSI calculation.
-        :return: RSI values as a pandas Series.
-        """
-        if not prices or len(prices) < window:
-            return None
-        prices_series = pd.Series(prices)
-        delta = prices_series.diff()
-
-        gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
-
-        rs = gain / loss
-        rsi = 100 - (100 / (1 + rs))
-        return rsi
 
     def apply_indicators(self):
         """
@@ -90,9 +44,9 @@ class StrategyBase:
                     continue
 
                 # Calculate indicators
-                sma_14 = self.calculate_sma(close_prices, window=14).round(8).tolist()
-                ema_14 = self.calculate_ema(close_prices, window=14).round(8).tolist()
-                rsi_14 = self.calculate_rsi(close_prices, window=14).round(2).tolist()
+                sma_14 = calculate_sma(close_prices, window=14).round(8).tolist()
+                ema_14 = calculate_ema(close_prices, window=14).round(8).tolist()
+                rsi_14 = calculate_rsi(close_prices, window=14).round(2).tolist()
 
                 # Store indicators in dictionary
                 indicators[coin] = {
