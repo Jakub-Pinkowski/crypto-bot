@@ -103,13 +103,27 @@ def fetch_coins_data(all_symbols_data, potential_coins):
 
     coins_data = {}
 
-    # Fetch trading symbols
+    # Extract data from all_symbols_data
     symbols = all_symbols_data["exchange_info"]["symbols"]
     active_symbols = all_symbols_data["active_symbols"]
+    prices = {price["symbol"]: float(price["price"]) for price in all_symbols_data["prices"]}
+    stats = {stat["symbol"]: stat for stat in all_symbols_data["stats"] if stat["symbol"] in active_symbols}
 
     for coin in potential_coins:
         pairings = [symbol for symbol in symbols if symbol['baseAsset'] == coin or symbol['quoteAsset'] == coin]
         trading_pairs = [pair['symbol'] for pair in pairings if pair['symbol'] in active_symbols]
+
+        # Collect metadata for each pair
+        pair_metadata = {
+            pair['symbol']: {
+                "baseAsset": pair["baseAsset"],
+                "quoteAsset": pair["quoteAsset"],
+                "pricePrecision": pair["baseAssetPrecision"],
+                "qtyPrecision": pair["quotePrecision"],
+                "filters": pair["filters"],
+            }
+            for pair in pairings if pair["symbol"] in active_symbols
+        }
 
         # Initialize data collectors
         order_books = {}
@@ -133,11 +147,18 @@ def fetch_coins_data(all_symbols_data, potential_coins):
 
         # Store everything in the coin data
         coins_data[coin] = {
-            "pairings": trading_pairs,
-            "order_books": order_books,
-            "recent_trades": recent_trades,
-            "candlesticks": candlestick_data,
-            "aggregated_trades": aggregated_trades,
+            "pairings": trading_pairs,  # Active trading pairs
+            "pair_metadata": pair_metadata,  # Metadata for each pair
+            "real_time_prices": {  # Latest prices for active pairs
+                pair: prices.get(pair, None) for pair in trading_pairs
+            },
+            "market_stats": {  # 24-hour market stats
+                pair: stats.get(pair, {}) for pair in trading_pairs
+            },
+            "order_books": order_books,  # Order book data
+            "recent_trades": recent_trades,  # Recent trades
+            "candlesticks": candlestick_data,  # Candlesticks (OHLC data)
+            "aggregated_trades": aggregated_trades,  # Aggregated trades
         }
 
     return coins_data
