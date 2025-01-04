@@ -1,9 +1,10 @@
 from services.data_fetcher import get_coins_data
+from strategies.strategy_base import calculate_indicators
 
 if __name__ == "__main__":
-    # Fetch and prepare coins data
-    print("Fetching coins data...")
+    # Fetch coins data
     coins_data = get_coins_data()
 
-    # Print a summary or process the coins data
-    print(f"Fetched data for {len(coins_data)} coins.")
+    # Calculate indicators for each coin
+    coins_indicators = calculate_indicators(coins_data)
+    print(f"coins_indicators: {coins_indicators}")
