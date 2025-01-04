@@ -1,4 +1,6 @@
-import time
+import json
+import os
+from datetime import datetime
 from binance_auth import client
 
 def fetch_all_symbols_data():
@@ -164,6 +166,33 @@ def fetch_coins_data(all_symbols_data, potential_coins):
 
     return coins_data
 
+def save_coins_data_to_file(coins_data, filename=None):
+    """
+    Saves coins_data to a JSON file in the market_data folder.
+
+    Parameters:
+        coins_data (dict): The data to be saved.
+        filename (str, optional): File name for the saved data. Uses timestamp by default.
+
+    Returns:
+        Nothing
+    """
+    # Default file name with timestamp if none is provided
+    if not filename:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"coins_data_{timestamp}.json"
+
+    # Ensure the market_data folder exists
+    base_dir = os.path.dirname(os.path.dirname(__file__))  # Navigate to project root
+    directory = os.path.join(base_dir, "data", "market_data")
+    os.makedirs(directory, exist_ok=True)  # Ensure target directory exists
+
+    # Save the data as JSON
+    file_path = os.path.join(directory, filename)
+    with open(file_path, "w") as file:
+        json.dump(coins_data, file, indent=4)
+
+    print(f"Coins data saved to {file_path}")
 
 if __name__ == "__main__":
     # Fetch data for all the symbols
@@ -174,3 +203,6 @@ if __name__ == "__main__":
 
     # Fetch coins data
     coins_data = fetch_coins_data(all_symbols_data, potential_coins)
+
+    # Save coins data to a file
+    save_coins_data_to_file(coins_data)
