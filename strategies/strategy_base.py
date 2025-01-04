@@ -13,14 +13,13 @@ def calculate_indicators(coins_data):
 
 class StrategyBase:
     def __init__(self, coins_data):
-        """
-        Initialize the base strategy class with the given coins data.
+        # TODO: Add a description
 
-        :param coins_data: Dictionary containing all relevant data for coins.
-        """
         self.coins_data = coins_data
         
     def extract_close_prices(self, coin):
+        # TODO: Add a description
+
         candlestick_data = self.coins_data[coin].get("candlesticks", {})
         close_prices = []
         for pair, data_list in candlestick_data.items():
@@ -29,34 +28,51 @@ class StrategyBase:
         return close_prices
         
 
-    def apply_indicators(self):
-        """
-        Apply all indicators to the coins_data and return only indicators.
+    def calculate_basic_indicators(self, close_prices):
+        indicators = {}
+        try:
+            # Calculate Simple Moving Average (SMA)
+            sma_period = 14
+            indicators['SMA'] = calculate_sma(close_prices, sma_period)
 
-        :return: Dictionary containing indicators for each coin.
-        """
+            # Calculate Exponential Moving Average (EMA)
+            ema_period = 14
+            indicators['EMA'] = calculate_ema(close_prices, ema_period)
+
+            # Calculate Relative Strength Index (RSI)
+            rsi_period = 14
+            indicators['RSI'] = calculate_rsi(close_prices, rsi_period)
+
+        except Exception as e:
+            print(f"Error in calculating basic indicators: {e}")
+
+        return indicators
+
+    def apply_indicators(self):
         indicators = {}  # To store indicators for each coin
 
         for coin, data in self.coins_data.items():
             try:
                 # Extract close prices using the new method
                 close_prices = self.extract_close_prices(coin)
-                
+
                 # Validate there are enough prices for indicator calculation
                 if len(close_prices) < 2:
                     print(f"Not enough close prices for {coin}, skipping...")
                     continue
 
-                # Calculate indicators
-                sma_14 = calculate_sma(close_prices, window=14).round(8).tolist()
-                ema_14 = calculate_ema(close_prices, window=14).round(8).tolist()
-                rsi_14 = calculate_rsi(close_prices, window=14).round(2).tolist()
+                # Calculate basic indicators
+                basic_indicators = self.calculate_basic_indicators(close_prices)
 
-                # Store indicators in dictionary
+                # Calculate some other indicator
+                # TODO: Implement new indicator group here
+
+                # Combine all indicators together
                 indicators[coin] = {
-                    "sma_14": sma_14,
-                    "ema_14": ema_14,
-                    "rsi_14": rsi_14,
+                    'basic': basic_indicators,
+                    # Placeholder for additional indicator sections:
+                    # 'trends': trend_indicators,
+                    # 'advanced': advanced_indicators,
                 }
 
             except Exception as e:
