@@ -6,21 +6,29 @@ crypto_bot/
 │   ├── logs/                     # Logs generated during runtime
 │   ├── market_data/              # Raw market data for analysis 
 ├── indicators/
-│   ├── __init__.py               # Makes the folder a Python package
+│   ├── __init__.py               
 │   ├── indicator_base.py         # Base class for indicators
 │   ├── trend_indicators.py       # Module for calculating trend-based indicators (e.g., moving averages)
 │   ├── momentum_indicators.py    # Module for calculating momentum-based indicators (e.g., RSI, MACD)
 │   ├── volatility_indicators.py  # Module for calculating volatility-based indicators (e.g., Bollinger Bands, ATR)
+├── order_execution/              
+│   ├── __init__.py               
+│   ├── executor_base.py          # Base class/interface for executors
 ├── services/
-│   ├── __init__.py               # Makes the folder a Python package
+│   ├── __init__.py               
+│   ├── binance_auth.py           # Binance authentication
 │   ├── data_fetcher.py           # Fetch market data from exchanges
-│   ├── order_executor.py         # Buy/sell orders handling
 │   ├── portfolio_manager.py      # Track portfolio (e.g., balances, PnL)
+├── strategies/                   # New folder for all strategies
+│   ├── __init__.py               
+│   ├── base_strategy.py          # Base class/interface for all strategies
 ├── tests/
-│   ├── test_strategies.py        # Unit tests for indicators
+│   ├── test_indicators.py        # Unit tests for indicators
+│   ├── test_order_execution.py   # Unit tests for order execution
 │   ├── test_services.py          # Unit tests for services
+│   ├── test_strategies.py        # Unit tests for strategies
 ├── utils/
-│   ├── __init__.py               # Makes the folder a Python package
+│   ├── __init__.py               
 │   ├── logger.py                 # Logging utility
 │   ├── data_processing.py        # Helper functions for data manipulation or transformations
 ├── .env                          # Environment variables
