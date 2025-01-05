@@ -16,6 +16,87 @@ def calculate_indicators(coins_data):
 
     return indicators
 
+def extract_ohlc_prices(coins_data, coin):
+    candlestick_data = coins_data[coin].get("candlesticks", {})
+
+    # Lists to store prices
+    high_prices = []
+    low_prices = []
+    close_prices = []
+
+    for pair, data_list in candlestick_data.items():
+        high_prices.extend([float(ohlcv[2]) for ohlcv in data_list])  # index 2 is the high price
+        low_prices.extend([float(ohlcv[3]) for ohlcv in data_list])  # index 3 is the low price
+        close_prices.extend([float(ohlcv[4]) for ohlcv in data_list])  # index 4 is the close price
+
+    return high_prices, low_prices, close_prices
+
+def calculate_trend_indicators(high_prices, low_prices, close_prices):
+    indicators = {}
+    try:
+        # Simple Moving Average (SMA)
+        sma_period = 14
+        indicators['SMA'] = calculate_sma(close_prices, sma_period)
+
+        # Exponential Moving Average (EMA)
+        ema_period = 14
+        indicators['EMA'] = calculate_ema(close_prices, ema_period)
+
+        # MACD
+        indicators['MACD'] = calculate_macd(close_prices)
+
+        # Calculate Ichimoku Cloud
+        indicators['Ichimoku'] = calculate_ichimoku_cloud(high_prices, low_prices, close_prices)
+
+    except Exception as e:
+        print(f"Error in calculating basic indicators: {e}")
+
+    return indicators
+
+def calculate_momentum_indicators(high_prices, low_prices, close_prices):
+    indicators = {}
+    try:
+        # Relative Strength Index (RSI)
+        rsi_period = 14
+        indicators['RSI'] = calculate_rsi(close_prices, rsi_period)
+
+        # Stochastic Oscillator
+        stochastic_window = 14
+        indicators['StochasticOscillator'] = calculate_stochastic_oscillator(
+            high_prices, low_prices, close_prices, stochastic_window
+        )
+
+        # Williams %R
+        williams_r_window = 14
+        indicators['Williams%R'] = calculate_williams_r(
+            high_prices, low_prices, close_prices, williams_r_window
+        )
+
+        # Commodity Channel Index (CCI)
+        cci_window = 20
+        indicators['CCI'] = calculate_cci(
+            high_prices, low_prices, close_prices, cci_window
+        )
+
+    except Exception as e:
+        print(f"Error in calculating momentum indicators: {e}")
+
+    return indicators
+
+def calculate_volatility_indicators(high_prices, low_prices, close_prices):
+    indicators = {}
+    try:
+        # Bollinger Bands
+        indicators['BollingerBands'] = calculate_bollinger_bands(close_prices)
+
+        # Average True Range (ATR)
+        atr_period = 14
+        indicators['ATR'] = calculate_atr(high_prices, low_prices, close_prices, atr_period)
+
+    except Exception as e:
+        print(f"Error in calculating advanced indicators: {e}")
+
+    return indicators
 
 def clean_indicators(indicators):
     """
@@ -76,73 +157,6 @@ class IncidatorBase:
             close_prices.extend([float(ohlcv[4]) for ohlcv in data_list])  # index 4 is the close price
 
         return high_prices, low_prices, close_prices
-
-    def calculate_trend_indicators(self, high_prices, low_prices, close_prices):
-        indicators = {}
-        try:
-            # Simple Moving Average (SMA)
-            sma_period = 14
-            indicators['SMA'] = calculate_sma(close_prices, sma_period)
-
-            # Exponential Moving Average (EMA)
-            ema_period = 14
-            indicators['EMA'] = calculate_ema(close_prices, ema_period)
-
-            # MACD
-            indicators['MACD'] = calculate_macd(close_prices)
-
-            # Calculate Ichimoku Cloud
-            indicators['Ichimoku'] = calculate_ichimoku_cloud(high_prices, low_prices, close_prices)
-
-        except Exception as e:
-            print(f"Error in calculating basic indicators: {e}")
-
-        return indicators
-
-    def calculate_momentum_indicators(self, high_prices, low_prices, close_prices):
-        indicators = {}
-        try:
-            # Relative Strength Index (RSI)
-            rsi_period = 14
-            indicators['RSI'] = calculate_rsi(close_prices, rsi_period)
-
-            # Stochastic Oscillator
-            stochastic_window = 14
-            indicators['StochasticOscillator'] = calculate_stochastic_oscillator(
-                high_prices, low_prices, close_prices, stochastic_window
-            )
-
-            # Williams %R
-            williams_r_window = 14
-            indicators['Williams%R'] = calculate_williams_r(
-                high_prices, low_prices, close_prices, williams_r_window
-            )
-
-            # Commodity Channel Index (CCI)
-            cci_window = 20
-            indicators['CCI'] = calculate_cci(
-                high_prices, low_prices, close_prices, cci_window
-            )
-
-        except Exception as e:
-            print(f"Error in calculating momentum indicators: {e}")
-
-        return indicators
-
-    def calculate_volatility_indicators(self, high_prices, low_prices, close_prices):
-        indicators = {}
-        try:
-            # Bollinger Bands
-            indicators['BollingerBands'] = calculate_bollinger_bands(close_prices)
-
-            # Average True Range (ATR)
-            atr_period = 14
-            indicators['ATR'] = calculate_atr(high_prices, low_prices, close_prices, atr_period)
-
-        except Exception as e:
-            print(f"Error in calculating advanced indicators: {e}")
-
-        return indicators
 
     def simplify_trend_indicators(self, trend_indicators, close_prices):
         """
@@ -253,16 +267,12 @@ class IncidatorBase:
                     print(f"Not enough close prices for {coin}, skipping...")
                     continue
 
-                # Calculate trend indicators
-                trend_indicators = self.calculate_trend_indicators(high_prices, low_prices, close_prices)
+                # Calculate indicators
+                trend_indicators = calculate_trend_indicators(high_prices, low_prices, close_prices)
+                momentum_indicators = calculate_momentum_indicators(high_prices, low_prices, close_prices)
+                volatility_indicators = calculate_volatility_indicators(high_prices, low_prices, close_prices)
 
-                # Calculate momentum indicators
-                momentum_indicators = self.calculate_momentum_indicators(high_prices, low_prices, close_prices)
-
-                # Calculate volatility indicators
-                volatility_indicators = self.calculate_volatility_indicators(high_prices, low_prices, close_prices)
-
-                # **Simplify** the data into the latest value or actionable signals
+                # Simplify the data into the latest value or actionable signals
                 simplified_trend = self.simplify_trend_indicators(trend_indicators, close_prices)
                 simplified_momentum = self.simplify_momentum_indicators(momentum_indicators)
                 simplified_volatility = self.simplify_volatility_indicators(volatility_indicators, close_prices)
