@@ -1,29 +1,31 @@
 crypto_bot/
 ├── config/
-│   ├── config.yaml          # General bot configurations (e.g., API details, trading pairs)
-│   ├── secrets.yaml         # Sensitive data like API keys (secured)
+│   ├── config.yaml               # General bot configurations (e.g., API details, trading pairs)
+│   ├── secrets.yaml              # Sensitive data like API keys (secured)
 ├── data/
-│   ├── logs/                # Logs generated during runtime
-│   ├── market_data/         # Raw market data for analysis (if needed)
+│   ├── logs/                     # Logs generated during runtime
+│   ├── market_data/              # Raw market data for analysis 
 ├── indicators/
-│   ├── __init__.py          # Makes the folder a Python package
-│   ├── indicator_base.py     # Base class for indicators
-│   ├── trend_indicators.py
-│   ├── momentum_indicators.py
-│   ├── volatility_indicators.py
+│   ├── __init__.py               # Makes the folder a Python package
+│   ├── indicator_base.py         # Base class for indicators
+│   ├── trend_indicators.py       # Module for calculating trend-based indicators (e.g., moving averages)
+│   ├── momentum_indicators.py    # Module for calculating momentum-based indicators (e.g., RSI, MACD)
+│   ├── volatility_indicators.py  # Module for calculating volatility-based indicators (e.g., Bollinger Bands, ATR)
 ├── services/
 │   ├── __init__.py          
-│   ├── data_fetcher.py      # Fetch market data from exchanges
-│   ├── order_executor.py    # Buy/sell orders handling
-│   ├── portfolio_manager.py # Track portfolio (e.g., balances, PnL)
+│   ├── data_fetcher.py           # Fetch market data from exchanges
+│   ├── order_executor.py         # Buy/sell orders handling
+│   ├── portfolio_manager.py      # Track portfolio (e.g., balances, PnL)
 ├── tests/
-│   ├── test_strategies.py   # Unit tests for indicators
-│   ├── test_services.py     # Unit tests for services
+│   ├── test_strategies.py        # Unit tests for indicators
+│   ├── test_services.py          # Unit tests for services
 ├── utils/
 │   ├── __init__.py          
-│   ├── logger.py            # Logging utility
-│   ├── data_processing.py   # Helper functions for data manipulation or transformations
-├── main.py                  # Entry point for the bot
-├── requirements.txt         # Python package dependencies
-├── .gitignore               # Ignore secrets, logs, etc., for Git
-└── README.md                # Project documentation
+│   ├── logger.py                 # Logging utility
+│   ├── data_processing.py        # Helper functions for data manipulation or transformations
+├── .env                          # Environment variables
+├── .gitignore                    # Ignore secrets, logs, etc., for Git
+├── main.py                       # Entry point for the bot
+├── README.md                     # Project documentation
+├── requirements.txt              # Python package dependencies
+└── structure.yaml                # Project folder structure
