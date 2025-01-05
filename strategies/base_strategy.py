@@ -1,81 +1,112 @@
-def analyze_coins(indicators):
+import json
+import os
+from datetime import datetime
+
+def save_analysis_to_file(analysis, filename=None):
     """
-    Analyzes indicators for each coin and applies a basic trading strategy.
-    For now, the strategy uses:
-    - RSI: Determines overbought or oversold signals.
-    - SMA: Checks for price relative to Simple Moving Average (SMA).
+    Saves the analysis results to a JSON file in the analysis_data folder.
+
+    Parameters:
+        analysis (dict): The data to be saved (analysis results).
+        filename (str, optional): File name for the saved data. Defaults to timestamped name.
+
+    Returns:
+        Nothing
+    """
+    # Default file name with timestamp if none is provided
+    if not filename:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"analysis_{timestamp}.json"
+
+    # Ensure the analysis_data folder exists
+    base_dir = os.path.dirname(os.path.dirname(__file__))  # Navigate to project root
+    directory = os.path.join(base_dir, "data", "analysis_data")
+    os.makedirs(directory, exist_ok=True)  # Create the folder if it doesn't exist
+
+    # Save the analysis data as JSON
+    file_path = os.path.join(directory, filename)
+    with open(file_path, "w") as file:
+        json.dump(analysis, file, indent=4)
+
+    print(f"Analysis saved to {file_path}")
+
+
+def analyze_coins(indicators, score_threshold=2.0):
+    """
+    Analyze indicators, rank coins, and determine buy/sell/hold actions for the portfolio.
+
+    If conditions for trading (buy/sell) are not met, the bot will recommend holding.
 
     :param indicators: A dictionary containing all indicators for each coin.
-                       Example:
-                       {
-                           "BTC": {
-                               "trend": {"SMA": 45000},
-                               "momentum": {"RSI": 25},
-                               "volatility": {}
-                           },
-                           "ETH": {
-                               "trend": {"SMA": 2400},
-                               "momentum": {"RSI": 75},
-                               "volatility": {}
-                           }
-                       }
-    :return: A dictionary containing analysis for each coin.
-             Example:
-             {
-                 "BTC": {
-                     "action": "BUY",
-                     "reason": ["RSI indicates oversold."],
-                     "indicators": {...}
-                 },
-                 "ETH": {
-                     "action": "SELL",
-                     "reason": ["RSI indicates overbought."],
-                     "indicators": {...}
-                 }
-             }
+    :param score_threshold: Minimum score difference to trigger a buy/sell action.
+    :return: A dictionary containing actions for each coin and the reasoning.
     """
     analyzed_coins = {}
+    rankings = []
 
     for coin, coin_indicators in indicators.items():
         # Extract relevant indicators
-        sma = coin_indicators["trend"].get("SMA")
         rsi = coin_indicators["momentum"].get("RSI")
+        rsi_penalty = (70 - rsi) if rsi else 0  # Penalize overbought RSI
 
-        # Prepare default analysis structure
-        analysis = {
-            "action": None,  # Default no action
-            "reason": [],  # Reasons behind the action
-            "indicators": coin_indicators  # Include all indicators for transparency
+        sma = coin_indicators["trend"].get("SMA")
+        current_price = coin_indicators["trend"].get("current_price", sma)  # Assume SMA if price is missing
+        sma_score = (current_price / sma - 1) if sma else 0  # Reward undervalued coins
+
+        macd_histogram = coin_indicators["trend"].get("MACD_histogram", 0)
+
+        # Calculate composite score
+        score = (
+                rsi_penalty * 1.5 +  # Weight for RSI
+                sma_score * -2 +  # Weight for SMA
+                macd_histogram * 3  # Weight for MACD
+        )
+
+        # Append coin and score to rankings
+        rankings.append((coin, score))
+
+        # Default action for this coin
+        analyzed_coins[coin] = {
+            "action": "HOLD",  # Default action unless decided otherwise
+            "reason": [],
+            "score": score  # Include score for transparency
         }
 
-        # Apply RSI-based strategy
-        if rsi is not None:
-            if rsi < 30:  # RSI less than 30 indicates oversold condition
-                analysis["action"] = "BUY"
-                analysis["reason"].append("RSI indicates oversold.")
-            elif rsi > 70:  # RSI greater than 70 indicates overbought condition
-                analysis["action"] = "SELL"
-                analysis["reason"].append("RSI indicates overbought.")
+    # Rank coins by score
+    rankings.sort(key=lambda x: x[1], reverse=True)  # Higher score = more attractive
 
-        # Apply SMA-based strategy
-        if sma is not None:
-            price = coin_indicators["trend"].get("current_price")  # Assume SMA logic involving current price
-            if price is not None:
-                if price > sma:
-                    if analysis["action"] is None:
-                        analysis["action"] = "BUY"
-                    analysis["reason"].append("Price is above SMA, indicating upward trend.")
-                elif price < sma:
-                    if analysis["action"] is None:
-                        analysis["action"] = "SELL"
-                    analysis["reason"].append("Price is below SMA, indicating downward trend.")
+    # Decision-making based on rankings
+    if len(rankings) > 1:
+        best_coin, best_score = rankings[0]
+        worst_coin, worst_score = rankings[-1]
 
-        # Default to HOLD if no actionable signal is determined
-        if analysis["action"] is None:
-            analysis["action"] = "HOLD"
-            analysis["reason"].append("No strong signal for action at this moment.")
+        # Check if the score difference exceeds the threshold
+        score_gap = best_score - worst_score
+        if score_gap >= score_threshold:
+            # Signal to buy the most attractive coin
+            analyzed_coins[best_coin]["action"] = "BUY"
+            analyzed_coins[best_coin]["reason"].append(
+                f"Highest attractiveness score ({best_score:.2f})."
+            )
 
-        # Add analyzed data for the coin
-        analyzed_coins[coin] = analysis
+            # Signal to sell the least attractive coin
+            analyzed_coins[worst_coin]["action"] = "SELL"
+            analyzed_coins[worst_coin]["reason"].append(
+                f"Lowest attractiveness score ({worst_score:.2f})."
+            )
+        else:
+            # If the score gap is too small, hold the portfolio
+            for coin in analyzed_coins:
+                analyzed_coins[coin]["action"] = "HOLD"
+                analyzed_coins[coin]["reason"].append(
+                    f"Score difference too small ({score_gap:.2f}), no significant action taken."
+                )
+    else:
+        # If there's only one coin in the portfolio, no trading can occur
+        for coin in analyzed_coins:
+            analyzed_coins[coin]["action"] = "HOLD"
+            analyzed_coins[coin]["reason"].append("Only one coin available, holding.")
+
+    save_analysis_to_file(analyzed_coins)
 
     return analyzed_coins

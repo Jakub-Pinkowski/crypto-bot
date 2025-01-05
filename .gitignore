@@ -12,9 +12,10 @@ config/secrets.yaml
 config/*.yaml
 
 # Data files
+data/analysis_data/
+data/indicators_data/
 data/logs/
 data/market_data/
-data/indicators_data/
 *.sqlite3
 
 # Testing/coverage results
