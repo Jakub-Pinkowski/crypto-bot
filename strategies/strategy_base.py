@@ -1,5 +1,6 @@
-from strategies.basic_indicators import calculate_sma, calculate_ema, calculate_rsi
-from strategies.advanced_indicators import calculate_bollinger_bands, calculate_macd
+from strategies.trend_indicators import calculate_sma, calculate_ema, calculate_macd
+from strategies.momentum_indicators import  calculate_rsi
+from strategies.volatility_indicators import calculate_bollinger_bands
 
 def calculate_indicators(coins_data):
     strategy = StrategyBase(coins_data)
@@ -26,9 +27,8 @@ class StrategyBase:
             close_prices.extend([float(ohlcv[4]) for ohlcv in data_list])  # index 4 is the close price
     
         return close_prices
-        
 
-    def calculate_basic_indicators(self, close_prices):
+    def calculate_trend_indicators(self, close_prices):
         indicators = {}
         try:
             # Simple Moving Average (SMA)
@@ -39,23 +39,32 @@ class StrategyBase:
             ema_period = 14
             indicators['EMA'] = calculate_ema(close_prices, ema_period)
 
-            # Relative Strength Index (RSI)
-            rsi_period = 14
-            indicators['RSI'] = calculate_rsi(close_prices, rsi_period)
+            # MACD
+            indicators['MACD'] = calculate_macd(close_prices)
 
         except Exception as e:
             print(f"Error in calculating basic indicators: {e}")
 
         return indicators
 
-    def calculate_advanced_indicators(self, close_prices):
+    def calculate_momentum_indicators(self, close_prices):
+        indicators = {}
+        try:
+            # Relative Strength Index (RSI)
+            rsi_period = 14
+            indicators['RSI'] = calculate_rsi(close_prices, rsi_period)
+
+        except Exception as e:
+            print(f"Error in calculating advanced indicators: {e}")
+
+        return indicators
+
+    def calculate_volatility_indicators(self, close_prices):
         indicators = {}
         try:
             # Bollinger Bands
             indicators['BollingerBands'] = calculate_bollinger_bands(close_prices)
 
-            # MACD
-            indicators['MACD'] = calculate_macd(close_prices)
 
         except Exception as e:
             print(f"Error in calculating advanced indicators: {e}")
@@ -75,16 +84,20 @@ class StrategyBase:
                     print(f"Not enough close prices for {coin}, skipping...")
                     continue
 
-                # Calculate basic indicators
-                basic_indicators = self.calculate_basic_indicators(close_prices)
+                # Calculate trend indicators
+                trend_indicators = self.calculate_trend_indicators(close_prices)
 
-                # Calculate advanced indicators
-                advanced_indicators = self.calculate_advanced_indicators(close_prices)
+                # Calculate momentum indicators
+                momentum_indicators = self.calculate_momentum_indicators(close_prices)
+
+                # Calculate volatility indicators
+                volatility_indicators = self.calculate_volatility_indicators(close_prices)
 
                 # Combine all indicators together
                 indicators[coin] = {
-                    'basic': basic_indicators,
-                    'advanced': advanced_indicators,
+                    'trend': trend_indicators,
+                    'momentum': momentum_indicators,
+                    'volatility': volatility_indicators
                 }
 
             except Exception as e:

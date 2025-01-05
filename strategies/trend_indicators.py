@@ -1,30 +1,45 @@
 import pandas as pd
 
-def calculate_bollinger_bands(prices, window=20, num_std_dev=2):
+def calculate_sma(prices, window=14):
     """
-    Calculate Bollinger Bands.
+    Calculate Simple Moving Average (SMA).
+
+    Detailed explanation including key steps or concepts:
+    - Calculate a rolling window mean on the prices.
+    - Use pandas' rolling method to handle the computation.
 
     Parameters:
         prices (list or pd.Series): List or array of prices.
-        window (int, optional): Number of periods for SMA (default 20).
-        num_std_dev (int, optional): Number of standard deviations (default 2).
+        window (int, optional): Number of periods for SMA calculation (default 14).
 
     Returns:
-        dict: Bollinger Bands with 'middle', 'upper', and 'lower' keys.
+        pd.Series: SMA values as a pandas Series.
     """
-    if not prices or len(prices) < window:
+    if not prices:
         return None
     prices_series = pd.Series(prices)
-    middle_band = prices_series.rolling(window=window).mean()
-    std_dev = prices_series.rolling(window=window).std()
-    upper_band = middle_band + (std_dev * num_std_dev)
-    lower_band = middle_band - (std_dev * num_std_dev)
-    return {
-        'middle_band': middle_band,
-        'upper_band': upper_band,
-        'lower_band': lower_band
-    }
+    return prices_series.rolling(window=window).mean()
 
+
+def calculate_ema(prices, window=14):
+    """
+    Calculate Exponential Moving Average (EMA).
+
+    Detailed explanation including key steps or concepts:
+    - Use pandas' ewm method to compute the EMA.
+    - EWM method applies weighted averages to prices, with recent prices weighted higher.
+
+    Parameters:
+        prices (list or pd.Series): List or array of prices.
+        window (int, optional): Number of periods for EMA calculation (default 14).
+
+    Returns:
+        pd.Series: EMA values as a pandas Series.
+    """
+    if not prices:
+        return None
+    prices_series = pd.Series(prices)
+    return prices_series.ewm(span=window, adjust=False).mean()
 
 def calculate_macd(prices, short_window=12, long_window=26, signal_window=9):
     """
@@ -52,4 +67,5 @@ def calculate_macd(prices, short_window=12, long_window=26, signal_window=9):
         'signal_line': signal_line,
         'histogram': histogram
     }
+
 
