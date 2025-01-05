@@ -7,9 +7,10 @@ crypto_bot/
 │   ├── market_data/         # Raw market data for analysis (if needed)
 ├── indicators/
 │   ├── __init__.py          # Makes the folder a Python package
-│   ├── strategy_base.py     # Base class for indicators
-│   ├── 
-│   ├── 
+│   ├── indicator_base.py     # Base class for indicators
+│   ├── trend_indicators.py
+│   ├── momentum_indicators.py
+│   ├── volatility_indicators.py
 ├── services/
 │   ├── __init__.py          
 │   ├── data_fetcher.py      # Fetch market data from exchanges

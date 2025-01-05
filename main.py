@@ -1,5 +1,5 @@
 from services.data_fetcher import get_coins_data
-from indicators.strategy_base import calculate_indicators
+from indicators.indicator_base import calculate_indicators
 
 if __name__ == "__main__":
     # Fetch coins data
