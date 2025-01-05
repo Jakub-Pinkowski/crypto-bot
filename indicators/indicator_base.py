@@ -17,6 +17,36 @@ def calculate_indicators(coins_data):
     return indicators
 
 
+def clean_indicators(indicators):
+    """
+    Convert any NumPy data types in the indicators dictionary
+    into standard Python types for clean representation.
+    """
+
+    def convert_value(value):
+        # Convert NumPy scalars to Python types
+        if isinstance(value, (np.float64, np.float32)):
+            return round(float(value), 4)  # Convert to Python float and round to 4 decimals
+        elif isinstance(value, (np.int64, np.int32, np.int_)):
+            return int(value)  # Convert to standard Python int
+        elif isinstance(value, np.bool_):
+            return bool(value)  # Convert to standard Python bool
+        elif isinstance(value, dict):
+            # Recursively clean and round nested dictionaries
+            return {k: convert_value(v) for k, v in value.items()}
+        elif isinstance(value, list):
+            # Recursively clean lists
+            return [convert_value(v) for v in value]
+        elif isinstance(value, float):
+            return round(value, 4)  # Round Python native floats
+        else:
+            # Return the value as is if it doesn't need conversion or rounding
+            return value
+
+    # Clean the entire indicators dictionary
+    return {coin: convert_value(data) for coin, data in indicators.items()}
+
+
 class IncidatorBase:
     def __init__(self, coins_data):
         # TODO: Add a description
@@ -209,35 +239,6 @@ class IncidatorBase:
 
         return simplified
 
-    def clean_indicators(self, indicators):
-        """
-        Convert any NumPy data types in the indicators dictionary
-        into standard Python types for clean representation.
-        """
-
-        def convert_value(value):
-            # Convert NumPy scalars to Python types
-            if isinstance(value, (np.float64, np.float32)):
-                return round(float(value), 4)  # Convert to Python float and round to 4 decimals
-            elif isinstance(value, (np.int64, np.int32, np.int_)):
-                return int(value)  # Convert to standard Python int
-            elif isinstance(value, np.bool_):
-                return bool(value)  # Convert to standard Python bool
-            elif isinstance(value, dict):
-                # Recursively clean and round nested dictionaries
-                return {k: convert_value(v) for k, v in value.items()}
-            elif isinstance(value, list):
-                # Recursively clean lists
-                return [convert_value(v) for v in value]
-            elif isinstance(value, float):
-                return round(value, 4)  # Round Python native floats
-            else:
-                # Return the value as is if it doesn't need conversion or rounding
-                return value
-
-        # Clean the entire indicators dictionary
-        return {coin: convert_value(data) for coin, data in indicators.items()}
-
 
     def apply_indicators(self):
         indicators = {}  # To store indicators for each coin
@@ -277,7 +278,7 @@ class IncidatorBase:
                 print(f"Error calculating indicators for {coin}: {e}")
 
         # Create a cleaned version of the indicators
-        cleaned_indicators = self.clean_indicators(indicators)
+        cleaned_indicators = clean_indicators(indicators)
 
         # Save indicators to a file
         save_data_to_file(cleaned_indicators, "indicators_data", "indicators")
