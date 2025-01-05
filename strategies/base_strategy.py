@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from strategies.scoring_systems import scoring_system_1, scoring_system_2, scoring_system_3
 
 def save_analysis_to_file(analysis, filename=None):
     """
@@ -33,18 +34,22 @@ def save_analysis_to_file(analysis, filename=None):
 
     print(f"Analysis saved to {file_path}")
 
-def analyze_coins(indicators, score_threshold=2.0):
+def analyze_coins(indicators):
     """
     Analyze indicators, rank coins, and determine buy/sell/hold actions for the portfolio.
 
     If conditions for trading (buy/sell) are not met, the bot will recommend holding.
 
     :param indicators: A dictionary containing all indicators for each coin.
-    :param score_threshold: Minimum score difference to trigger a buy/sell action.
+
     :return: A dictionary containing actions for each coin and the reasoning.
     """
     analyzed_coins = {}
     rankings = []
+
+    # Define variables for the scoring system
+    score_threshold = 2.0
+    scoring_function = scoring_system_1
 
     for coin, coin_indicators in indicators.items():
         # Extract relevant indicators
@@ -58,11 +63,7 @@ def analyze_coins(indicators, score_threshold=2.0):
         macd_histogram = coin_indicators["trend"].get("MACD_histogram", 0)
 
         # Calculate composite score
-        score = (
-                rsi_penalty * 1.5 +  # Weight for RSI
-                sma_score * -2 +  # Weight for SMA
-                macd_histogram * 3  # Weight for MACD
-        )
+        score = scoring_function(rsi_penalty, sma_score, macd_histogram)
 
         # Append coin and score to rankings
         rankings.append((coin, score))
