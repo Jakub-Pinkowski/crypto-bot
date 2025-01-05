@@ -6,9 +6,17 @@ from indicators.volatility_indicators import calculate_bollinger_bands, calculat
 from utils.file_utils import save_data_to_file
 
 def calculate_indicators(coins_data):
+    # Get indicators
     indicators = apply_indicators(coins_data)
 
-    return indicators
+    # Clean indicators
+    cleaned_indicators = clean_indicators(indicators)
+
+    # Save indicators to a file
+    save_data_to_file(cleaned_indicators, "indicators_data", "indicators")
+
+    # Return the cleaned_indicators
+    return cleaned_indicators
 
 def extract_ohlc_prices(coins_data, coin):
     candlestick_data = coins_data[coin].get("candlesticks", {})
@@ -248,11 +256,6 @@ def apply_indicators(coins_data):
         except Exception as e:
             print(f"Error calculating indicators for {coin}: {e}")
 
-    # Create a cleaned version of the indicators
-    cleaned_indicators = clean_indicators(indicators)
+    return indicators
 
-    # Save indicators to a file
-    save_data_to_file(cleaned_indicators, "indicators_data", "indicators")
 
-    # Return the cleaned_indicators
-    return cleaned_indicators

@@ -13,16 +13,16 @@ def get_coins_data():
     Returns:
         dict: A dictionary containing detailed data for all filtered coins.
     """
-    # Step 1: Fetch general symbols data
+    # Fetch general symbols data
     all_symbols_data = fetch_all_symbols_data()
 
-    # Step 2: Filter for potential coins
+    # Filter for potential coins
     potential_coins = filter_potential_coins(all_symbols_data)
 
-    # Step 3: Fetch detailed data for filtered coins
+    # Fetch detailed data for filtered coins
     coins_data = fetch_coins_data(all_symbols_data, potential_coins)
 
-    # Step 4: Save coins data to a file
+    # Save coins data to a file
     save_data_to_file(coins_data, "market_data", "coins_data")
 
     # Return the coins data
