@@ -77,8 +77,8 @@ def filter_potential_coins(all_symbols_data):
     """
 
     # Define filter thresholds
-    price_change_threshold = 10.0  # Minimum percentage price change (absolute)
-    price_range_volatility_threshold = 0.1  # Minimum range volatility in %
+    price_change_threshold = 5.0  # Minimum percentage price change (absolute)
+    price_range_volatility_threshold = 0.01  # Minimum range volatility in %
 
     # Extract relevant data from input
     symbols = all_symbols_data["exchange_info"]["symbols"]

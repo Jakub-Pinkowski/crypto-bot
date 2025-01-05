@@ -4,7 +4,7 @@ from datetime import datetime
 
 def save_analysis_to_file(analysis, filename=None):
     """
-    Saves the analysis results to a JSON file in the analysis_data folder.
+    Saves the analysis results to a JSON file in the analysis_data folder, sorted by score.
 
     Parameters:
         analysis (dict): The data to be saved (analysis results).
@@ -23,13 +23,15 @@ def save_analysis_to_file(analysis, filename=None):
     directory = os.path.join(base_dir, "data", "analysis_data")
     os.makedirs(directory, exist_ok=True)  # Create the folder if it doesn't exist
 
+    # Sort analysis by score (best to worst)
+    sorted_analysis = dict(sorted(analysis.items(), key=lambda item: item[1]["score"], reverse=True))
+
     # Save the analysis data as JSON
     file_path = os.path.join(directory, filename)
     with open(file_path, "w") as file:
-        json.dump(analysis, file, indent=4)
+        json.dump(sorted_analysis, file, indent=4)
 
     print(f"Analysis saved to {file_path}")
-
 
 def analyze_coins(indicators, score_threshold=2.0):
     """
