@@ -1,3 +1,6 @@
+import json
+import os
+from datetime import datetime
 import numpy as np
 
 from indicators.trend_indicators import calculate_sma, calculate_ema, calculate_macd, calculate_ichimoku_cloud
@@ -214,24 +217,55 @@ class IncidatorBase:
 
         def convert_value(value):
             # Convert NumPy scalars to Python types
-            if isinstance(value, (np.float64, np.float32,)):
-                return float(value)  # Convert to standard Python float
+            if isinstance(value, (np.float64, np.float32)):
+                return round(float(value), 4)  # Convert to Python float and round to 4 decimals
             elif isinstance(value, (np.int64, np.int32, np.int_)):
                 return int(value)  # Convert to standard Python int
             elif isinstance(value, (np.bool_)):
                 return bool(value)  # Convert to standard Python bool
             elif isinstance(value, dict):
-                # Recursively clean nested dictionaries
+                # Recursively clean and round nested dictionaries
                 return {k: convert_value(v) for k, v in value.items()}
             elif isinstance(value, list):
                 # Recursively clean lists
                 return [convert_value(v) for v in value]
+            elif isinstance(value, float):
+                return round(value, 4)  # Round Python native floats
             else:
-                # Return the value as is if it doesn't need conversion
+                # Return the value as is if it doesn't need conversion or rounding
                 return value
 
         # Clean the entire indicators dictionary
         return {coin: convert_value(data) for coin, data in indicators.items()}
+
+
+    def save_indicators_to_file(self, indicators, filename=None):
+        """
+        Saves indicators to a JSON file in the indicators_data folder.
+
+        Parameters:
+            indicators (dict): The data to be saved.
+            filename (str, optional): File name for the saved data. Uses timestamp by default.
+
+        Returns:
+            Nothing
+        """
+        # Default file name with timestamp if none is provided
+        if not filename:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"indicators_{timestamp}.json"
+
+        # Ensure the indicators_data folder exists
+        base_dir = os.path.dirname(os.path.dirname(__file__))  # Navigate to project root
+        directory = os.path.join(base_dir, "data", "indicators_data")
+        os.makedirs(directory, exist_ok=True)  # Ensure target directory exists
+
+        # Save the data as JSON
+        file_path = os.path.join(directory, filename)
+        with open(file_path, "w") as file:
+            json.dump(indicators, file, indent=4)
+
+        print(f"Indicators data saved to {file_path}")
 
     def apply_indicators(self):
         indicators = {}  # To store indicators for each coin
@@ -273,5 +307,9 @@ class IncidatorBase:
         # Create a cleaned version of the indicators
         cleaned_indicators = self.clean_indicators(indicators)
 
+        # Save indicators to a file
+        self.save_indicators_to_file(cleaned_indicators)
+
         # Return the cleaned_indicators
         return cleaned_indicators
+

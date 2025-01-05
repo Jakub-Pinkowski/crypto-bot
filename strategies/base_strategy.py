@@ -1,4 +1,3 @@
-
 def analyze_coins(indicators):
     """
     Analyzes indicators for each coin and applies a basic trading strategy.

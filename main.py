@@ -8,7 +8,6 @@ if __name__ == "__main__":
 
     # Calculate indicators for each coin
     coins_indicators = calculate_indicators(coins_data)
-    print(f"Indicators for coins: {coins_indicators}")
 
     # Analyze the indicators for each coin
     analyzed_coins = analyze_coins(coins_indicators)
