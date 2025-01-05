@@ -1,5 +1,5 @@
-import pandas as pd
 from strategies.basic_indicators import calculate_sma, calculate_ema, calculate_rsi
+from strategies.advanced_indicators import calculate_bollinger_bands, calculate_macd
 
 def calculate_indicators(coins_data):
     strategy = StrategyBase(coins_data)
@@ -31,20 +31,34 @@ class StrategyBase:
     def calculate_basic_indicators(self, close_prices):
         indicators = {}
         try:
-            # Calculate Simple Moving Average (SMA)
+            # Simple Moving Average (SMA)
             sma_period = 14
             indicators['SMA'] = calculate_sma(close_prices, sma_period)
 
-            # Calculate Exponential Moving Average (EMA)
+            # Exponential Moving Average (EMA)
             ema_period = 14
             indicators['EMA'] = calculate_ema(close_prices, ema_period)
 
-            # Calculate Relative Strength Index (RSI)
+            # Relative Strength Index (RSI)
             rsi_period = 14
             indicators['RSI'] = calculate_rsi(close_prices, rsi_period)
 
         except Exception as e:
             print(f"Error in calculating basic indicators: {e}")
+
+        return indicators
+
+    def calculate_advanced_indicators(self, close_prices):
+        indicators = {}
+        try:
+            # Bollinger Bands
+            indicators['BollingerBands'] = calculate_bollinger_bands(close_prices)
+
+            # MACD
+            indicators['MACD'] = calculate_macd(close_prices)
+
+        except Exception as e:
+            print(f"Error in calculating advanced indicators: {e}")
 
         return indicators
 
@@ -64,18 +78,17 @@ class StrategyBase:
                 # Calculate basic indicators
                 basic_indicators = self.calculate_basic_indicators(close_prices)
 
-                # Calculate some other indicator
-                # TODO: Implement new indicator group here
+                # Calculate advanced indicators
+                advanced_indicators = self.calculate_advanced_indicators(close_prices)
 
                 # Combine all indicators together
                 indicators[coin] = {
                     'basic': basic_indicators,
-                    # Placeholder for additional indicator sections:
-                    # 'trends': trend_indicators,
-                    # 'advanced': advanced_indicators,
+                    'advanced': advanced_indicators,
                 }
 
             except Exception as e:
                 print(f"Error calculating indicators for {coin}: {e}")
 
+        print(f"indicators: {indicators}")
         return indicators
