@@ -5,18 +5,18 @@ crypto_bot/
 ├── data/
 │   ├── logs/                # Logs generated during runtime
 │   ├── market_data/         # Raw market data for analysis (if needed)
-├── strategies/
+├── indicators/
 │   ├── __init__.py          # Makes the folder a Python package
-│   ├── strategy_base.py     # Base class for strategies
-│   ├── moving_average.py    # Example strategy (e.g., moving average crossover)
-│   ├── rsi_strategy.py      # Another strategy (e.g., RSI indicator)
+│   ├── strategy_base.py     # Base class for indicators
+│   ├── 
+│   ├── 
 ├── services/
 │   ├── __init__.py          
 │   ├── data_fetcher.py      # Fetch market data from exchanges
 │   ├── order_executor.py    # Buy/sell orders handling
 │   ├── portfolio_manager.py # Track portfolio (e.g., balances, PnL)
 ├── tests/
-│   ├── test_strategies.py   # Unit tests for strategies
+│   ├── test_strategies.py   # Unit tests for indicators
 │   ├── test_services.py     # Unit tests for services
 ├── utils/
 │   ├── __init__.py          

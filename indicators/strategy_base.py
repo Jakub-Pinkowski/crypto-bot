@@ -1,9 +1,9 @@
-from strategies.trend_indicators import calculate_sma, calculate_ema, calculate_macd, calculate_ichimoku_cloud
-from strategies.momentum_indicators import  calculate_rsi, calculate_stochastic_oscillator, calculate_williams_r, calculate_cci
-from strategies.volatility_indicators import calculate_bollinger_bands, calculate_atr
+from indicators.trend_indicators import calculate_sma, calculate_ema, calculate_macd, calculate_ichimoku_cloud
+from indicators.momentum_indicators import  calculate_rsi, calculate_stochastic_oscillator, calculate_williams_r, calculate_cci
+from indicators.volatility_indicators import calculate_bollinger_bands, calculate_atr
 
 def calculate_indicators(coins_data):
-    strategy = StrategyBase(coins_data)
+    strategy = IncidatorBase(coins_data)
     print("Calculating indicators...")
 
     # Apply all indicators to data and return only indicators
@@ -12,7 +12,7 @@ def calculate_indicators(coins_data):
     return indicators
 
 
-class StrategyBase:
+class IncidatorBase:
     def __init__(self, coins_data):
         # TODO: Add a description
 
@@ -141,5 +141,4 @@ class StrategyBase:
             except Exception as e:
                 print(f"Error calculating indicators for {coin}: {e}")
 
-        print(f"indicators: {indicators}")
         return indicators
