@@ -2,16 +2,6 @@ from strategies.scoring_systems import get_active_scoring_system
 from utils.file_utils import save_data_to_file
 
 def analyze_coins(indicators):
-    """
-    Analyze indicators, rank coins, and determine buy/sell/hold actions for the portfolio.
-
-    If conditions for trading (buy/sell) are not met, the bot will recommend holding.
-
-    :param indicators: A dictionary containing all indicators for each coin.
-
-    Configure scoring function code added (call scoring functions).
-        Return dict comes separately tightly wrapped most conditions eliminated clarified
-    """
     analyzed_coins = {}
     rankings = []
 
