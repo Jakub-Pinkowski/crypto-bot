@@ -71,3 +71,28 @@ def calculate_volatility_indicators(high_prices, low_prices, close_prices):
         print(f"Error in calculating advanced indicators: {e}")
 
     return indicators
+
+def simplify_volatility_indicators(volatility_indicators, close_prices):
+    """
+    Simplifies volatility indicators into actionable insights.
+    """
+    simplified = {}
+
+    # Bollinger Bands: Extract the width or position relative to the bands
+    if "BollingerBands" in volatility_indicators:
+        bands = volatility_indicators["BollingerBands"]
+
+        if "upper_band" in bands and "lower_band" in bands and "middle_band" in bands:
+            # Calculate the Bollinger Band width
+            simplified["Bollinger_width"] = bands["upper_band"].iloc[-1] - bands["lower_band"].iloc[-1]
+
+            # Check if the close price is above or below the bands
+            last_close = close_prices[-1]
+            simplified["close_above_upper"] = last_close > bands["upper_band"].iloc[-1]
+            simplified["close_below_lower"] = last_close < bands["lower_band"].iloc[-1]
+
+    # ATR (Average True Range): Include volatility signal
+    if "ATR" in volatility_indicators:
+        simplified["ATR"] = volatility_indicators["ATR"].iloc[-1]
+
+    return simplified

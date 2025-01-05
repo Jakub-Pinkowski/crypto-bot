@@ -138,3 +138,36 @@ def calculate_momentum_indicators(high_prices, low_prices, close_prices):
         print(f"Error in calculating momentum indicators: {e}")
 
     return indicators
+
+def simplify_momentum_indicators(momentum_indicators):
+    """
+    Simplifies momentum indicators by extracting actionable signals.
+    """
+    simplified = {}
+
+    # RSI: Extract the latest value and add thresholds
+    if "RSI" in momentum_indicators:
+        simplified["RSI"] = momentum_indicators["RSI"].iloc[-1]
+        simplified["RSI_signal"] = "oversold" if simplified["RSI"] < 30 else (
+            "overbought" if simplified["RSI"] > 70 else "neutral"
+        )
+
+    # Stochastic Oscillator: Include overbought/oversold signals
+    if "StochasticOscillator" in momentum_indicators:
+        stochastic = momentum_indicators["StochasticOscillator"]
+
+        if "%K" in stochastic and "%D" in stochastic:
+            # Safely retrieve the latest value of %K and %D
+            simplified["Stochastic_%K"] = stochastic["%K"].iloc[-1] if not stochastic["%K"].empty else None
+            simplified["Stochastic_%D"] = stochastic["%D"].iloc[-1] if not stochastic["%D"].empty else None
+
+            # Check if the latest %K indicates an overbought or oversold condition
+            if simplified["Stochastic_%K"] is not None:
+                if simplified["Stochastic_%K"] < 20:
+                    simplified["Stochastic_signal"] = "oversold"
+                elif simplified["Stochastic_%K"] > 80:
+                    simplified["Stochastic_signal"] = "overbought"
+                else:
+                    simplified["Stochastic_signal"] = "neutral"
+
+    return simplified

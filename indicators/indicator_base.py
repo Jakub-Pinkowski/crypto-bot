@@ -1,8 +1,8 @@
 import numpy as np
 
 from indicators.trend_indicators import calculate_trend_indicators, simplify_trend_indicators
-from indicators.momentum_indicators import calculate_momentum_indicators
-from indicators.volatility_indicators import calculate_volatility_indicators
+from indicators.momentum_indicators import calculate_momentum_indicators, simplify_momentum_indicators
+from indicators.volatility_indicators import calculate_volatility_indicators, simplify_volatility_indicators
 from utils.file_utils import save_data_to_file
 
 def calculate_indicators(coins_data):
@@ -32,64 +32,6 @@ def extract_ohlc_prices(coins_data, coin):
         close_prices.extend([float(ohlcv[4]) for ohlcv in data_list])  # index 4 is the close price
 
     return high_prices, low_prices, close_prices
-
-def simplify_momentum_indicators(momentum_indicators):
-    """
-    Simplifies momentum indicators by extracting actionable signals.
-    """
-    simplified = {}
-
-    # RSI: Extract the latest value and add thresholds
-    if "RSI" in momentum_indicators:
-        simplified["RSI"] = momentum_indicators["RSI"].iloc[-1]
-        simplified["RSI_signal"] = "oversold" if simplified["RSI"] < 30 else (
-            "overbought" if simplified["RSI"] > 70 else "neutral"
-        )
-
-    # Stochastic Oscillator: Include overbought/oversold signals
-    if "StochasticOscillator" in momentum_indicators:
-        stochastic = momentum_indicators["StochasticOscillator"]
-
-        if "%K" in stochastic and "%D" in stochastic:
-            # Safely retrieve the latest value of %K and %D
-            simplified["Stochastic_%K"] = stochastic["%K"].iloc[-1] if not stochastic["%K"].empty else None
-            simplified["Stochastic_%D"] = stochastic["%D"].iloc[-1] if not stochastic["%D"].empty else None
-
-            # Check if the latest %K indicates an overbought or oversold condition
-            if simplified["Stochastic_%K"] is not None:
-                if simplified["Stochastic_%K"] < 20:
-                    simplified["Stochastic_signal"] = "oversold"
-                elif simplified["Stochastic_%K"] > 80:
-                    simplified["Stochastic_signal"] = "overbought"
-                else:
-                    simplified["Stochastic_signal"] = "neutral"
-
-    return simplified
-
-def simplify_volatility_indicators(volatility_indicators, close_prices):
-        """
-        Simplifies volatility indicators into actionable insights.
-        """
-        simplified = {}
-
-        # Bollinger Bands: Extract the width or position relative to the bands
-        if "BollingerBands" in volatility_indicators:
-            bands = volatility_indicators["BollingerBands"]
-
-            if "upper_band" in bands and "lower_band" in bands and "middle_band" in bands:
-                # Calculate the Bollinger Band width
-                simplified["Bollinger_width"] = bands["upper_band"].iloc[-1] - bands["lower_band"].iloc[-1]
-
-                # Check if the close price is above or below the bands
-                last_close = close_prices[-1]
-                simplified["close_above_upper"] = last_close > bands["upper_band"].iloc[-1]
-                simplified["close_below_lower"] = last_close < bands["lower_band"].iloc[-1]
-
-        # ATR (Average True Range): Include volatility signal
-        if "ATR" in volatility_indicators:
-            simplified["ATR"] = volatility_indicators["ATR"].iloc[-1]
-
-        return simplified
 
 def clean_indicators(indicators):
     """
