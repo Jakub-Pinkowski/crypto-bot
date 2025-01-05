@@ -1,6 +1,6 @@
 from strategies.trend_indicators import calculate_sma, calculate_ema, calculate_macd, calculate_ichimoku_cloud
-from strategies.momentum_indicators import  calculate_rsi
-from strategies.volatility_indicators import calculate_bollinger_bands
+from strategies.momentum_indicators import  calculate_rsi, calculate_stochastic_oscillator, calculate_williams_r, calculate_cci
+from strategies.volatility_indicators import calculate_bollinger_bands, calculate_atr
 
 def calculate_indicators(coins_data):
     strategy = StrategyBase(coins_data)
@@ -64,23 +64,45 @@ class StrategyBase:
 
         return indicators
 
-    def calculate_momentum_indicators(self, close_prices):
+    def calculate_momentum_indicators(self, high_prices, low_prices, close_prices):
         indicators = {}
         try:
             # Relative Strength Index (RSI)
             rsi_period = 14
             indicators['RSI'] = calculate_rsi(close_prices, rsi_period)
 
+            # Stochastic Oscillator
+            stochastic_window = 14
+            indicators['StochasticOscillator'] = calculate_stochastic_oscillator(
+                high_prices, low_prices, close_prices, stochastic_window
+            )
+
+            # Williams %R
+            williams_r_window = 14
+            indicators['Williams%R'] = calculate_williams_r(
+                high_prices, low_prices, close_prices, williams_r_window
+            )
+
+            # Commodity Channel Index (CCI)
+            cci_window = 20
+            indicators['CCI'] = calculate_cci(
+                high_prices, low_prices, close_prices, cci_window
+            )
+
         except Exception as e:
-            print(f"Error in calculating advanced indicators: {e}")
+            print(f"Error in calculating momentum indicators: {e}")
 
         return indicators
 
-    def calculate_volatility_indicators(self, close_prices):
+    def calculate_volatility_indicators(self, high_prices, low_prices, close_prices):
         indicators = {}
         try:
             # Bollinger Bands
             indicators['BollingerBands'] = calculate_bollinger_bands(close_prices)
+
+            # Average True Range (ATR)
+            atr_period = 14
+            indicators['ATR'] = calculate_atr(high_prices, low_prices, close_prices, atr_period)
 
         except Exception as e:
             print(f"Error in calculating advanced indicators: {e}")
@@ -104,10 +126,10 @@ class StrategyBase:
                 trend_indicators = self.calculate_trend_indicators(high_prices, low_prices, close_prices)
 
                 # Calculate momentum indicators
-                momentum_indicators = self.calculate_momentum_indicators(close_prices)
+                momentum_indicators = self.calculate_momentum_indicators(high_prices, low_prices, close_prices)
 
                 # Calculate volatility indicators
-                volatility_indicators = self.calculate_volatility_indicators(close_prices)
+                volatility_indicators = self.calculate_volatility_indicators(high_prices, low_prices, close_prices)
 
                 # Combine all indicators together
                 indicators[coin] = {
