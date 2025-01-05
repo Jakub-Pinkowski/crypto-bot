@@ -1,6 +1,3 @@
-import json
-import os
-from datetime import datetime
 import numpy as np
 
 from indicators.trend_indicators import calculate_sma, calculate_ema, calculate_macd, calculate_ichimoku_cloud
@@ -9,10 +6,7 @@ from indicators.volatility_indicators import calculate_bollinger_bands, calculat
 from utils.file_utils import save_data_to_file
 
 def calculate_indicators(coins_data):
-    strategy = IncidatorBase(coins_data)
-
-    # Apply all indicators to data and return only indicators
-    indicators = strategy.apply_indicators()
+    indicators = apply_indicators(coins_data)
 
     return indicators
 
@@ -221,76 +215,44 @@ def clean_indicators(indicators):
     # Clean the entire indicators dictionary
     return {coin: convert_value(data) for coin, data in indicators.items()}
 
+def apply_indicators(coins_data):
+    indicators = {}
 
-class IncidatorBase:
-    def __init__(self, coins_data):
-        # TODO: Add a description
+    for coin, data in coins_data.items():
+        try:
+            # Extract high, low, close prices
+            high_prices, low_prices, close_prices = extract_ohlc_prices(coins_data, coin)
 
-        self.coins_data = coins_data
+            # Validate there are enough prices for indicator calculation
+            if len(close_prices) < 2:
+                print(f"Not enough close prices for {coin}, skipping...")
+                continue
 
-    def extract_ohlc_prices(self, coin):
-        """
-        Extract high, low, and close prices from the candlestick (OHLCV) data.
+            # Calculate indicators
+            trend_indicators = calculate_trend_indicators(high_prices, low_prices, close_prices)
+            momentum_indicators = calculate_momentum_indicators(high_prices, low_prices, close_prices)
+            volatility_indicators = calculate_volatility_indicators(high_prices, low_prices, close_prices)
 
-        Parameters:
-            coin (str): The name of the coin for which to extract prices.
+            # Simplify the data into the latest value or actionable signals
+            simplified_trend = simplify_trend_indicators(trend_indicators, close_prices)
+            simplified_momentum = simplify_momentum_indicators(momentum_indicators)
+            simplified_volatility = simplify_volatility_indicators(volatility_indicators, close_prices)
 
-        Returns:
-            tuple: (high_prices, low_prices, close_prices), each as a list of floats.
-        """
-        candlestick_data = self.coins_data[coin].get("candlesticks", {})
+            # Combine simplified indicators into the final structure
+            indicators[coin] = {
+                'trend': simplified_trend,
+                'momentum': simplified_momentum,
+                'volatility': simplified_volatility
+            }
 
-        # Lists to store prices
-        high_prices = []
-        low_prices = []
-        close_prices = []
+        except Exception as e:
+            print(f"Error calculating indicators for {coin}: {e}")
 
-        for pair, data_list in candlestick_data.items():
-            high_prices.extend([float(ohlcv[2]) for ohlcv in data_list])  # index 2 is the high price
-            low_prices.extend([float(ohlcv[3]) for ohlcv in data_list])  # index 3 is the low price
-            close_prices.extend([float(ohlcv[4]) for ohlcv in data_list])  # index 4 is the close price
+    # Create a cleaned version of the indicators
+    cleaned_indicators = clean_indicators(indicators)
 
-        return high_prices, low_prices, close_prices
+    # Save indicators to a file
+    save_data_to_file(cleaned_indicators, "indicators_data", "indicators")
 
-    def apply_indicators(self):
-        indicators = {}  # To store indicators for each coin
-
-        for coin, data in self.coins_data.items():
-            try:
-                # Extract high, low, close prices
-                high_prices, low_prices, close_prices = self.extract_ohlc_prices(coin)
-
-                # Validate there are enough prices for indicator calculation
-                if len(close_prices) < 2:
-                    print(f"Not enough close prices for {coin}, skipping...")
-                    continue
-
-                # Calculate indicators
-                trend_indicators = calculate_trend_indicators(high_prices, low_prices, close_prices)
-                momentum_indicators = calculate_momentum_indicators(high_prices, low_prices, close_prices)
-                volatility_indicators = calculate_volatility_indicators(high_prices, low_prices, close_prices)
-
-                # Simplify the data into the latest value or actionable signals
-                simplified_trend = simplify_trend_indicators(trend_indicators, close_prices)
-                simplified_momentum = simplify_momentum_indicators(momentum_indicators)
-                simplified_volatility = simplify_volatility_indicators(volatility_indicators, close_prices)
-
-                # Combine simplified indicators into the final structure
-                indicators[coin] = {
-                    'trend': simplified_trend,
-                    'momentum': simplified_momentum,
-                    'volatility': simplified_volatility
-                }
-
-            except Exception as e:
-                print(f"Error calculating indicators for {coin}: {e}")
-
-        # Create a cleaned version of the indicators
-        cleaned_indicators = clean_indicators(indicators)
-
-        # Save indicators to a file
-        save_data_to_file(cleaned_indicators, "indicators_data", "indicators")
-
-        # Return the cleaned_indicators
-        return cleaned_indicators
-
+    # Return the cleaned_indicators
+    return cleaned_indicators
