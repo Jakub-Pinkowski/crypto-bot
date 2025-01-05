@@ -14,7 +14,6 @@ def get_coins_data():
     # Save coins data to a file
     save_data_to_file(coins_data, "market_data", "coins_data")
 
-    # Return the coins data
     return coins_data
 
 def fetch_all_symbols_data():
@@ -105,16 +104,9 @@ def fetch_coins_data(all_symbols_data, potential_coins):
 
         # Collect data for each pairing
         for pair in trading_pairs:
-            # Order book
             order_books[pair] = client.depth(symbol=pair, limit=100)
-
-            # Recent trades
             recent_trades[pair] = client.trades(symbol=pair, limit=100)
-
-            # Candlestick data (last 24 1-hour candles)
             candlestick_data[pair] = client.klines(symbol=pair, interval='1h', limit=24)
-
-            # Aggregated trades
             aggregated_trades[pair] = client.agg_trades(symbol=pair, limit=100)
 
         # Store everything in the coin data
