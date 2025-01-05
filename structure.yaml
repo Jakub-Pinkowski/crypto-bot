@@ -3,7 +3,8 @@ crypto_bot/
 │   ├── config.yaml               # General bot configurations (e.g., API details, trading pairs)
 │   ├── secrets.yaml              # Sensitive data like API keys (secured)
 ├── data/
-│   ├── indicators_data/           # Indicators for analysis
+│   ├── analysis_data/            # Coin analysis
+│   ├── indicators_data/          # Indicators for analysis
 │   ├── logs/                     # Logs generated during runtime
 │   ├── market_data/              # Raw market data for analysis 
 ├── indicators/
