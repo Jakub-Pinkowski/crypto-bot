@@ -221,7 +221,7 @@ class IncidatorBase:
                 return round(float(value), 4)  # Convert to Python float and round to 4 decimals
             elif isinstance(value, (np.int64, np.int32, np.int_)):
                 return int(value)  # Convert to standard Python int
-            elif isinstance(value, (np.bool_)):
+            elif isinstance(value, np.bool_):
                 return bool(value)  # Convert to standard Python bool
             elif isinstance(value, dict):
                 # Recursively clean and round nested dictionaries
