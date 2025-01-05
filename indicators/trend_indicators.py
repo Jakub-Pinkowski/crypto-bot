@@ -20,7 +20,6 @@ def calculate_sma(prices, window=14):
     prices_series = pd.Series(prices)
     return prices_series.rolling(window=window).mean()
 
-
 def calculate_ema(prices, window=14):
     """
     Calculate Exponential Moving Average (EMA).
@@ -118,3 +117,25 @@ def calculate_ichimoku_cloud(highs, lows, closes, tenkan_window=9, kijun_window=
         'senkou_span_b': senkou_span_b,
         'chikou_span': chikou_span
     }
+
+def calculate_trend_indicators(high_prices, low_prices, close_prices):
+    indicators = {}
+    try:
+        # Simple Moving Average (SMA)
+        sma_period = 14
+        indicators['SMA'] = calculate_sma(close_prices, sma_period)
+
+        # Exponential Moving Average (EMA)
+        ema_period = 14
+        indicators['EMA'] = calculate_ema(close_prices, ema_period)
+
+        # MACD
+        indicators['MACD'] = calculate_macd(close_prices)
+
+        # Calculate Ichimoku Cloud
+        indicators['Ichimoku'] = calculate_ichimoku_cloud(high_prices, low_prices, close_prices)
+
+    except Exception as e:
+        print(f"Error in calculating basic indicators: {e}")
+
+    return indicators

@@ -108,3 +108,33 @@ def calculate_cci(highs, lows, closes, window=20):
     cci = (typical_price - tp_sma) / (0.015 * mean_deviation)
 
     return cci
+
+def calculate_momentum_indicators(high_prices, low_prices, close_prices):
+    indicators = {}
+    try:
+        # Relative Strength Index (RSI)
+        rsi_period = 14
+        indicators['RSI'] = calculate_rsi(close_prices, rsi_period)
+
+        # Stochastic Oscillator
+        stochastic_window = 14
+        indicators['StochasticOscillator'] = calculate_stochastic_oscillator(
+            high_prices, low_prices, close_prices, stochastic_window
+        )
+
+        # Williams %R
+        williams_r_window = 14
+        indicators['Williams%R'] = calculate_williams_r(
+            high_prices, low_prices, close_prices, williams_r_window
+        )
+
+        # Commodity Channel Index (CCI)
+        cci_window = 20
+        indicators['CCI'] = calculate_cci(
+            high_prices, low_prices, close_prices, cci_window
+        )
+
+    except Exception as e:
+        print(f"Error in calculating momentum indicators: {e}")
+
+    return indicators

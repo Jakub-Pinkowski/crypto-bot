@@ -56,3 +56,18 @@ def calculate_atr(highs, lows, closes, window=14):
     atr = true_range.rolling(window=window).mean()
 
     return atr
+
+def calculate_volatility_indicators(high_prices, low_prices, close_prices):
+    indicators = {}
+    try:
+        # Bollinger Bands
+        indicators['BollingerBands'] = calculate_bollinger_bands(close_prices)
+
+        # Average True Range (ATR)
+        atr_period = 14
+        indicators['ATR'] = calculate_atr(high_prices, low_prices, close_prices, atr_period)
+
+    except Exception as e:
+        print(f"Error in calculating advanced indicators: {e}")
+
+    return indicators
