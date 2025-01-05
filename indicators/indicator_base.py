@@ -1,6 +1,6 @@
 import numpy as np
 
-from indicators.trend_indicators import calculate_trend_indicators
+from indicators.trend_indicators import calculate_trend_indicators, simplify_trend_indicators
 from indicators.momentum_indicators import calculate_momentum_indicators
 from indicators.volatility_indicators import calculate_volatility_indicators
 from utils.file_utils import save_data_to_file
@@ -32,42 +32,6 @@ def extract_ohlc_prices(coins_data, coin):
         close_prices.extend([float(ohlcv[4]) for ohlcv in data_list])  # index 4 is the close price
 
     return high_prices, low_prices, close_prices
-
-def simplify_trend_indicators(trend_indicators, close_prices):
-    """
-    Simplifies trend indicators by extracting actionable data.
-    """
-    simplified = {}
-
-    # Extract the latest value for each trend indicator
-    if "SMA" in trend_indicators:
-        simplified["SMA"] = trend_indicators["SMA"].iloc[-1]  # Latest SMA value
-
-        # Check if close price is above or below the SMA
-        simplified["above_SMA"] = close_prices[-1] > simplified["SMA"]
-
-    if "EMA" in trend_indicators:
-        simplified["EMA"] = trend_indicators["EMA"].iloc[-1]  # Latest EMA value
-
-    # MACD: Add signal direction (e.g., bullish or bearish crossover)
-    if "MACD" in trend_indicators and trend_indicators["MACD"]:
-        macd_data = trend_indicators["MACD"]
-
-        # Safely extract MACD components
-        simplified["MACD_current"] = macd_data["macd_line"].iloc[-1] if "macd_line" in macd_data else None
-        simplified["MACD_signal"] = macd_data["signal_line"].iloc[-1] if "signal_line" in macd_data else None
-        simplified["MACD_histogram"] = macd_data["histogram"].iloc[-1] if "histogram" in macd_data else None
-
-        # Determine the trend based on MACD and Signal line values
-        if simplified["MACD_current"] and simplified["MACD_signal"]:
-            simplified["MACD_trend"] = (
-                "bullish" if simplified["MACD_current"] > simplified["MACD_signal"] else "bearish"
-            )
-
-    else:
-        print(f"No valid MACD data for trend simplification.")
-
-    return simplified
 
 def simplify_momentum_indicators(momentum_indicators):
     """
