@@ -19,7 +19,6 @@ def save_analysis_to_file(analysis, filename=None):
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         filename = f"analysis_{timestamp}.json"
 
-    daily_folder = None  # Placeholder for daily folder to use later
     # Ensure the analysis_data folder exists
     base_dir = os.path.dirname(os.path.dirname(__file__))  # Navigate to project root
     daily_folder = datetime.now().strftime("%Y-%m-%d")

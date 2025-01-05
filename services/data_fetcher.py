@@ -1,7 +1,5 @@
-import json
-import os
-from datetime import datetime
 from services.binance_auth import client
+from utils.file_utils import save_data_to_file
 
 def get_coins_data():
     """
@@ -25,7 +23,7 @@ def get_coins_data():
     coins_data = fetch_coins_data(all_symbols_data, potential_coins)
 
     # Step 4: Save coins data to a file
-    save_coins_data_to_file(coins_data)
+    save_data_to_file(coins_data, "market_data", "coins_data")
 
     # Return the coins data
     return coins_data
@@ -193,30 +191,3 @@ def fetch_coins_data(all_symbols_data, potential_coins):
         }
 
     return coins_data
-
-def save_coins_data_to_file(coins_data, filename=None):
-    """
-    Saves coins_data to a JSON file in the market_data folder.
-
-    Parameters:
-        coins_data (dict): The data to be saved.
-        filename (str, optional): File name for the saved data. Uses timestamp by default.
-
-    Returns:
-        Nothing
-    """
-    # Default file name with timestamp if none is provided
-    if not filename:
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        date_folder = datetime.now().strftime("%Y-%m-%d")
-        filename = f"coins_data_{timestamp}.json"
-
-    # Ensure the daily folder exists in the market_data folder
-    base_dir = os.path.dirname(os.path.dirname(__file__))  # Navigate to project root
-    directory = os.path.join(base_dir, "data", "market_data", date_folder)
-    os.makedirs(directory, exist_ok=True)  # Ensure target directory exists
-
-    # Save the data as JSON
-    file_path = os.path.join(directory, filename)  # Prepare file path with new structure
-    with open(file_path, "w") as file:
-        json.dump(coins_data, file, indent=4)

@@ -24,6 +24,7 @@ crypto_bot/
 ├── strategies/                   # New folder for all strategies
 │   ├── __init__.py               
 │   ├── base_strategy.py          # Base class/interface for all strategies
+│   ├── scoring_systems.py        # Systems to score and evaluate strategies or trades 
 ├── tests/
 │   ├── test_indicators.py        # Unit tests for indicators
 │   ├── test_order_execution.py   # Unit tests for order execution
