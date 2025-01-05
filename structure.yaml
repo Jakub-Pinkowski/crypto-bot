@@ -12,7 +12,7 @@ crypto_bot/
 │   ├── momentum_indicators.py    # Module for calculating momentum-based indicators (e.g., RSI, MACD)
 │   ├── volatility_indicators.py  # Module for calculating volatility-based indicators (e.g., Bollinger Bands, ATR)
 ├── services/
-│   ├── __init__.py          
+│   ├── __init__.py               # Makes the folder a Python package
 │   ├── data_fetcher.py           # Fetch market data from exchanges
 │   ├── order_executor.py         # Buy/sell orders handling
 │   ├── portfolio_manager.py      # Track portfolio (e.g., balances, PnL)
@@ -20,7 +20,7 @@ crypto_bot/
 │   ├── test_strategies.py        # Unit tests for indicators
 │   ├── test_services.py          # Unit tests for services
 ├── utils/
-│   ├── __init__.py          
+│   ├── __init__.py               # Makes the folder a Python package
 │   ├── logger.py                 # Logging utility
 │   ├── data_processing.py        # Helper functions for data manipulation or transformations
 ├── .env                          # Environment variables
