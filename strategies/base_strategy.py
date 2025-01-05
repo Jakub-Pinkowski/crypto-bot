@@ -34,8 +34,6 @@ def save_analysis_to_file(analysis, filename=None):
     with open(file_path, "w") as file:
         json.dump(sorted_analysis, file, indent=4)
 
-    print(f"Analysis saved to {file_path}")
-
 def analyze_coins(indicators):
     """
     Analyze indicators, rank coins, and determine buy/sell/hold actions for the portfolio.

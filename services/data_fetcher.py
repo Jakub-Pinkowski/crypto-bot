@@ -220,5 +220,3 @@ def save_coins_data_to_file(coins_data, filename=None):
     file_path = os.path.join(directory, filename)  # Prepare file path with new structure
     with open(file_path, "w") as file:
         json.dump(coins_data, file, indent=4)
-
-    print(f"Coins data saved to {file_path}")
