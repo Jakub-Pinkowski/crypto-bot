@@ -98,6 +98,100 @@ def calculate_volatility_indicators(high_prices, low_prices, close_prices):
 
     return indicators
 
+def simplify_trend_indicators(trend_indicators, close_prices):
+    """
+    Simplifies trend indicators by extracting actionable data.
+    """
+    simplified = {}
+
+    # Extract the latest value for each trend indicator
+    if "SMA" in trend_indicators:
+        simplified["SMA"] = trend_indicators["SMA"].iloc[-1]  # Latest SMA value
+
+        # Check if close price is above or below the SMA
+        simplified["above_SMA"] = close_prices[-1] > simplified["SMA"]
+
+    if "EMA" in trend_indicators:
+        simplified["EMA"] = trend_indicators["EMA"].iloc[-1]  # Latest EMA value
+
+    # MACD: Add signal direction (e.g., bullish or bearish crossover)
+    if "MACD" in trend_indicators and trend_indicators["MACD"]:
+        macd_data = trend_indicators["MACD"]
+
+        # Safely extract MACD components
+        simplified["MACD_current"] = macd_data["macd_line"].iloc[-1] if "macd_line" in macd_data else None
+        simplified["MACD_signal"] = macd_data["signal_line"].iloc[-1] if "signal_line" in macd_data else None
+        simplified["MACD_histogram"] = macd_data["histogram"].iloc[-1] if "histogram" in macd_data else None
+
+        # Determine the trend based on MACD and Signal line values
+        if simplified["MACD_current"] and simplified["MACD_signal"]:
+            simplified["MACD_trend"] = (
+                "bullish" if simplified["MACD_current"] > simplified["MACD_signal"] else "bearish"
+            )
+
+    else:
+        print(f"No valid MACD data for trend simplification.")
+
+    return simplified
+
+def simplify_momentum_indicators(momentum_indicators):
+    """
+    Simplifies momentum indicators by extracting actionable signals.
+    """
+    simplified = {}
+
+    # RSI: Extract the latest value and add thresholds
+    if "RSI" in momentum_indicators:
+        simplified["RSI"] = momentum_indicators["RSI"].iloc[-1]
+        simplified["RSI_signal"] = "oversold" if simplified["RSI"] < 30 else (
+            "overbought" if simplified["RSI"] > 70 else "neutral"
+        )
+
+    # Stochastic Oscillator: Include overbought/oversold signals
+    if "StochasticOscillator" in momentum_indicators:
+        stochastic = momentum_indicators["StochasticOscillator"]
+
+        if "%K" in stochastic and "%D" in stochastic:
+            # Safely retrieve the latest value of %K and %D
+            simplified["Stochastic_%K"] = stochastic["%K"].iloc[-1] if not stochastic["%K"].empty else None
+            simplified["Stochastic_%D"] = stochastic["%D"].iloc[-1] if not stochastic["%D"].empty else None
+
+            # Check if the latest %K indicates an overbought or oversold condition
+            if simplified["Stochastic_%K"] is not None:
+                if simplified["Stochastic_%K"] < 20:
+                    simplified["Stochastic_signal"] = "oversold"
+                elif simplified["Stochastic_%K"] > 80:
+                    simplified["Stochastic_signal"] = "overbought"
+                else:
+                    simplified["Stochastic_signal"] = "neutral"
+
+    return simplified
+
+def simplify_volatility_indicators(volatility_indicators, close_prices):
+        """
+        Simplifies volatility indicators into actionable insights.
+        """
+        simplified = {}
+
+        # Bollinger Bands: Extract the width or position relative to the bands
+        if "BollingerBands" in volatility_indicators:
+            bands = volatility_indicators["BollingerBands"]
+
+            if "upper_band" in bands and "lower_band" in bands and "middle_band" in bands:
+                # Calculate the Bollinger Band width
+                simplified["Bollinger_width"] = bands["upper_band"].iloc[-1] - bands["lower_band"].iloc[-1]
+
+                # Check if the close price is above or below the bands
+                last_close = close_prices[-1]
+                simplified["close_above_upper"] = last_close > bands["upper_band"].iloc[-1]
+                simplified["close_below_lower"] = last_close < bands["lower_band"].iloc[-1]
+
+        # ATR (Average True Range): Include volatility signal
+        if "ATR" in volatility_indicators:
+            simplified["ATR"] = volatility_indicators["ATR"].iloc[-1]
+
+        return simplified
+
 def clean_indicators(indicators):
     """
     Convert any NumPy data types in the indicators dictionary
@@ -158,102 +252,6 @@ class IncidatorBase:
 
         return high_prices, low_prices, close_prices
 
-    def simplify_trend_indicators(self, trend_indicators, close_prices):
-        """
-        Simplifies trend indicators by extracting actionable data.
-        """
-        simplified = {}
-
-        # Extract the latest value for each trend indicator
-        if "SMA" in trend_indicators:
-            simplified["SMA"] = trend_indicators["SMA"].iloc[-1]  # Latest SMA value
-
-            # Check if close price is above or below the SMA
-            simplified["above_SMA"] = close_prices[-1] > simplified["SMA"]
-
-        if "EMA" in trend_indicators:
-            simplified["EMA"] = trend_indicators["EMA"].iloc[-1]  # Latest EMA value
-
-        # MACD: Add signal direction (e.g., bullish or bearish crossover)
-        if "MACD" in trend_indicators and trend_indicators["MACD"]:
-            macd_data = trend_indicators["MACD"]
-
-            # Safely extract MACD components
-            simplified["MACD_current"] = macd_data["macd_line"].iloc[-1] if "macd_line" in macd_data else None
-            simplified["MACD_signal"] = macd_data["signal_line"].iloc[-1] if "signal_line" in macd_data else None
-            simplified["MACD_histogram"] = macd_data["histogram"].iloc[-1] if "histogram" in macd_data else None
-
-            # Determine the trend based on MACD and Signal line values
-            if simplified["MACD_current"] and simplified["MACD_signal"]:
-                simplified["MACD_trend"] = (
-                    "bullish" if simplified["MACD_current"] > simplified["MACD_signal"] else "bearish"
-                )
-
-        else:
-            print(f"No valid MACD data for trend simplification.")
-
-
-        return simplified
-
-    def simplify_momentum_indicators(self, momentum_indicators):
-        """
-        Simplifies momentum indicators by extracting actionable signals.
-        """
-        simplified = {}
-
-        # RSI: Extract the latest value and add thresholds
-        if "RSI" in momentum_indicators:
-            simplified["RSI"] = momentum_indicators["RSI"].iloc[-1]
-            simplified["RSI_signal"] = "oversold" if simplified["RSI"] < 30 else (
-                "overbought" if simplified["RSI"] > 70 else "neutral"
-            )
-
-        # Stochastic Oscillator: Include overbought/oversold signals
-        if "StochasticOscillator" in momentum_indicators:
-            stochastic = momentum_indicators["StochasticOscillator"]
-
-            if "%K" in stochastic and "%D" in stochastic:
-                # Safely retrieve the latest value of %K and %D
-                simplified["Stochastic_%K"] = stochastic["%K"].iloc[-1] if not stochastic["%K"].empty else None
-                simplified["Stochastic_%D"] = stochastic["%D"].iloc[-1] if not stochastic["%D"].empty else None
-
-                # Check if the latest %K indicates an overbought or oversold condition
-                if simplified["Stochastic_%K"] is not None:
-                    if simplified["Stochastic_%K"] < 20:
-                        simplified["Stochastic_signal"] = "oversold"
-                    elif simplified["Stochastic_%K"] > 80:
-                        simplified["Stochastic_signal"] = "overbought"
-                    else:
-                        simplified["Stochastic_signal"] = "neutral"
-
-        return simplified
-
-    def simplify_volatility_indicators(self, volatility_indicators, close_prices):
-        """
-        Simplifies volatility indicators into actionable insights.
-        """
-        simplified = {}
-
-        # Bollinger Bands: Extract the width or position relative to the bands
-        if "BollingerBands" in volatility_indicators:
-            bands = volatility_indicators["BollingerBands"]
-
-            if "upper_band" in bands and "lower_band" in bands and "middle_band" in bands:
-                # Calculate the Bollinger Band width
-                simplified["Bollinger_width"] = bands["upper_band"].iloc[-1] - bands["lower_band"].iloc[-1]
-
-                # Check if the close price is above or below the bands
-                last_close = close_prices[-1]
-                simplified["close_above_upper"] = last_close > bands["upper_band"].iloc[-1]
-                simplified["close_below_lower"] = last_close < bands["lower_band"].iloc[-1]
-
-        # ATR (Average True Range): Include volatility signal
-        if "ATR" in volatility_indicators:
-            simplified["ATR"] = volatility_indicators["ATR"].iloc[-1]
-
-        return simplified
-
-
     def apply_indicators(self):
         indicators = {}  # To store indicators for each coin
 
@@ -273,9 +271,9 @@ class IncidatorBase:
                 volatility_indicators = calculate_volatility_indicators(high_prices, low_prices, close_prices)
 
                 # Simplify the data into the latest value or actionable signals
-                simplified_trend = self.simplify_trend_indicators(trend_indicators, close_prices)
-                simplified_momentum = self.simplify_momentum_indicators(momentum_indicators)
-                simplified_volatility = self.simplify_volatility_indicators(volatility_indicators, close_prices)
+                simplified_trend = simplify_trend_indicators(trend_indicators, close_prices)
+                simplified_momentum = simplify_momentum_indicators(momentum_indicators)
+                simplified_volatility = simplify_volatility_indicators(volatility_indicators, close_prices)
 
                 # Combine simplified indicators into the final structure
                 indicators[coin] = {
