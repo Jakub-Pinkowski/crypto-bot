@@ -2,17 +2,6 @@ from services.binance_auth import client
 from utils.file_utils import save_data_to_file
 
 def get_coins_data():
-    """
-    Main function to fetch and prepare coins data.
-    It performs the following steps:
-    1. Fetch general symbols data.
-    2. Filter for potential coins based on criteria.
-    3. Fetch market data for filtered coins.
-    4. Save the coins data to a file for later use.
-
-    Returns:
-        dict: A dictionary containing detailed data for all filtered coins.
-    """
     # Fetch general symbols data
     all_symbols_data = fetch_all_symbols_data()
 
@@ -28,17 +17,7 @@ def get_coins_data():
     # Return the coins data
     return coins_data
 
-
 def fetch_all_symbols_data():
-    """
-    Fetches general data for all symbols:
-    - Exchange information (active symbols, metadata)
-    - Current market prices
-    - 24-hour market statistics
-
-    Returns:
-        dict: Dictionary containing exchange_info, active_symbols, prices, and stats.
-    """
     # Fetch exchange information (metadata for symbols)
     exchange_info = client.exchange_info()
     active_symbols = {symbol['symbol'] for symbol in exchange_info['symbols'] if symbol['status'] == 'TRADING'}
@@ -60,20 +39,6 @@ def fetch_all_symbols_data():
     }
 
 def filter_potential_coins(all_symbols_data):
-    """
-    Filters potential symbols based on the following criteria:
-    - Significant price change (high volatility): Abs(priceChangePercent) > price_change_threshold
-    - High price range volatility: (highPrice - lowPrice) / lowPrice > price_range_volatility_threshold
-
-    Then extracts a robust set of unique assets (coins) from the filtered symbols.
-
-    Parameters:
-        all_symbols_data (dict): Dictionary containing exchange_info, active_symbols, prices, and stats.
-
-    Returns:
-        set: Set of unique coins from the filtered symbols.
-    """
-
     # Define filter thresholds
     price_change_threshold = 10.0  # Minimum percentage price change (absolute)
     price_range_volatility_threshold = 0.1  # Minimum range volatility in %
@@ -108,28 +73,6 @@ def filter_potential_coins(all_symbols_data):
     return potential_coins
 
 def fetch_coins_data(all_symbols_data, potential_coins):
-    """
-    Fetches data for each coin in the potential_coins set, including:
-    - Active trading pairings for each coin
-    - Order book data for active trading pairs
-    - Recent trades for each active trading pair
-    - Candlestick data (last 24 hours with 1-hour intervals)
-    - Aggregated trades for each active trading pair
-
-    Parameters:
-        all_symbols_data (dict): Dictionary containing exchange information and active symbols.
-        potential_coins (set): Set of potential coins to fetch data for.
-
-    Returns:
-        dict: A dictionary containing detailed data for each coin.
-              Each coin is mapped to its trading data, including:
-              - "pairings": List of active trading pairs for the coin.
-              - "order_books": Order book data for all active trading pairs.
-              - "recent_trades": Recent trades information for each trading pair.
-              - "candlesticks": Last 24 candlesticks (1-hour interval) for each pair.
-              - "aggregated_trades": Aggregated trade data for each pair.
-    """
-
     coins_data = {}
 
     # Extract data from all_symbols_data

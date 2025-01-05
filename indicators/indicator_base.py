@@ -34,11 +34,6 @@ def extract_ohlc_prices(coins_data, coin):
     return high_prices, low_prices, close_prices
 
 def clean_indicators(indicators):
-    """
-    Convert any NumPy data types in the indicators dictionary
-    into standard Python types for clean representation.
-    """
-
     def convert_value(value):
         # Convert NumPy scalars to Python types
         if isinstance(value, (np.float64, np.float32)):

@@ -1,17 +1,6 @@
 import pandas as pd
 
 def calculate_bollinger_bands(prices, window=20, num_std_dev=2):
-    """
-    Calculate Bollinger Bands.
-
-    Parameters:
-        prices (list or pd.Series): List or array of prices.
-        window (int, optional): Number of periods for SMA (default 20).
-        num_std_dev (int, optional): Number of standard deviations (default 2).
-
-    Returns:
-        dict: Bollinger Bands with 'middle', 'upper', and 'lower' keys.
-    """
     if not prices or len(prices) < window:
         return None
     prices_series = pd.Series(prices)
@@ -26,18 +15,6 @@ def calculate_bollinger_bands(prices, window=20, num_std_dev=2):
     }
 
 def calculate_atr(highs, lows, closes, window=14):
-    """
-    Calculate Average True Range (ATR).
-
-    Parameters:
-        highs (list or pd.Series): High prices.
-        lows (list or pd.Series): Low prices.
-        closes (list or pd.Series): Close prices.
-        window (int, optional): Period for ATR calculation (default 14).
-
-    Returns:
-        pd.Series: ATR values as a pandas Series.
-    """
     if len(highs) < window or len(lows) < window or len(closes) < window:
         return None
 
@@ -73,9 +50,6 @@ def calculate_volatility_indicators(high_prices, low_prices, close_prices):
     return indicators
 
 def simplify_volatility_indicators(volatility_indicators, close_prices):
-    """
-    Simplifies volatility indicators into actionable insights.
-    """
     simplified = {}
 
     # Bollinger Bands: Extract the width or position relative to the bands

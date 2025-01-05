@@ -1,21 +1,6 @@
 import pandas as pd
 
 def calculate_rsi(prices, window=14):
-    """
-    Calculate Relative Strength Index (RSI).
-
-    Detailed explanation including key steps or concepts:
-    - Compute the price differences and separate into gains and losses.
-    - Calculate the average gain and loss over a rolling window.
-    - Compute the Relative Strength (RS) and use it to calculate RSI.
-
-    Parameters:
-        prices (list or pd.Series): List or array of prices.
-        window (int, optional): Number of periods for RSI calculation (default 14).
-
-    Returns:
-        pd.Series: RSI values as a pandas Series.
-    """
     if not prices or len(prices) < window:
         return None
     prices_series = pd.Series(prices)
@@ -29,19 +14,6 @@ def calculate_rsi(prices, window=14):
     return rsi
 
 def calculate_stochastic_oscillator(highs, lows, closes, window=14, smooth_window=3):
-    """
-    Calculate Stochastic Oscillator (%K and %D).
-
-    Parameters:
-        highs (list or pd.Series): High prices.
-        lows (list or pd.Series): Low prices.
-        closes (list or pd.Series): Close prices.
-        window (int, optional): Period for %K calculation (default 14).
-        smooth_window (int, optional): Period for smoothing %D (default 3).
-
-    Returns:
-        dict: {'%K': %K values, '%D': %D values}.
-    """
     if len(highs) < window or len(lows) < window or len(closes) < window:
         return None
 
@@ -56,18 +28,6 @@ def calculate_stochastic_oscillator(highs, lows, closes, window=14, smooth_windo
     }
 
 def calculate_williams_r(highs, lows, closes, window=14):
-    """
-    Calculate Williams %R.
-
-    Parameters:
-        highs (list or pd.Series): High prices.
-        lows (list or pd.Series): Low prices.
-        closes (list or pd.Series): Close prices.
-        window (int, optional): Period for %R calculation (default 14).
-
-    Returns:
-        pd.Series: Williams %R values as a pandas Series.
-    """
     if len(highs) < window or len(lows) < window or len(closes) < window:
         return None
 
@@ -78,18 +38,6 @@ def calculate_williams_r(highs, lows, closes, window=14):
     return williams_r
 
 def calculate_cci(highs, lows, closes, window=20):
-    """
-    Calculate Commodity Channel Index (CCI).
-
-    Parameters:
-        highs (list or pd.Series): High prices.
-        lows (list or pd.Series): Low prices.
-        closes (list or pd.Series): Close prices.
-        window (int, optional): Period for CCI calculation (default 20).
-
-    Returns:
-        pd.Series: CCI values as a pandas Series.
-    """
     if len(highs) < window or len(lows) < window or len(closes) < window:
         return None
 
@@ -140,9 +88,6 @@ def calculate_momentum_indicators(high_prices, low_prices, close_prices):
     return indicators
 
 def simplify_momentum_indicators(momentum_indicators):
-    """
-    Simplifies momentum indicators by extracting actionable signals.
-    """
     simplified = {}
 
     # RSI: Extract the latest value and add thresholds
