@@ -1,6 +1,10 @@
 from services.binance_auth import client
 from utils.file_utils import save_data_to_file
 
+# Define constants for filtering
+PRICE_CHANGE_THRESHOLD = 10.0  # Minimum percentage price change (absolute)
+PRICE_RANGE_VOLATILITY_THRESHOLD = 0.1  # Minimum range volatility in %
+
 def get_coins_data():
     # Fetch general symbols data
     all_symbols_data = fetch_all_symbols_data()
@@ -39,8 +43,8 @@ def fetch_all_symbols_data():
 
 def filter_potential_coins(all_symbols_data):
     # Define filter thresholds
-    price_change_threshold = 10.0  # Minimum percentage price change (absolute)
-    price_range_volatility_threshold = 0.1  # Minimum range volatility in %
+    price_change_threshold = PRICE_CHANGE_THRESHOLD
+    price_range_volatility_threshold = PRICE_RANGE_VOLATILITY_THRESHOLD
 
     # Extract relevant data from input
     symbols = all_symbols_data["exchange_info"]["symbols"]
