@@ -77,8 +77,8 @@ def filter_potential_coins(all_symbols_data):
     """
 
     # Define filter thresholds
-    price_change_threshold = 5.0  # Minimum percentage price change (absolute)
-    price_range_volatility_threshold = 0.01  # Minimum range volatility in %
+    price_change_threshold = 10.0  # Minimum percentage price change (absolute)
+    price_range_volatility_threshold = 0.1  # Minimum range volatility in %
 
     # Extract relevant data from input
     symbols = all_symbols_data["exchange_info"]["symbols"]
@@ -207,16 +207,17 @@ def save_coins_data_to_file(coins_data, filename=None):
     """
     # Default file name with timestamp if none is provided
     if not filename:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        date_folder = datetime.now().strftime("%Y-%m-%d")
         filename = f"coins_data_{timestamp}.json"
 
-    # Ensure the market_data folder exists
+    # Ensure the daily folder exists in the market_data folder
     base_dir = os.path.dirname(os.path.dirname(__file__))  # Navigate to project root
-    directory = os.path.join(base_dir, "data", "market_data")
+    directory = os.path.join(base_dir, "data", "market_data", date_folder)
     os.makedirs(directory, exist_ok=True)  # Ensure target directory exists
 
     # Save the data as JSON
-    file_path = os.path.join(directory, filename)
+    file_path = os.path.join(directory, filename)  # Prepare file path with new structure
     with open(file_path, "w") as file:
         json.dump(coins_data, file, indent=4)
 

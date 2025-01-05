@@ -252,20 +252,19 @@ class IncidatorBase:
         """
         # Default file name with timestamp if none is provided
         if not filename:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             filename = f"indicators_{timestamp}.json"
 
-        # Ensure the indicators_data folder exists
-        base_dir = os.path.dirname(os.path.dirname(__file__))  # Navigate to project root
-        directory = os.path.join(base_dir, "data", "indicators_data")
-        os.makedirs(directory, exist_ok=True)  # Ensure target directory exists
+            # Ensure the indicators_data folder exists
+            base_dir = os.path.dirname(os.path.dirname(__file__))  # Navigate to project root
+            date_folder = datetime.now().strftime("%Y-%m-%d")
+            directory = os.path.join(base_dir, "data", "indicators_data", date_folder)
+            os.makedirs(directory, exist_ok=True)  # Ensure target directory exists
 
-        # Save the data as JSON
-        file_path = os.path.join(directory, filename)
-        with open(file_path, "w") as file:
-            json.dump(indicators, file, indent=4)
-
-        print(f"Indicators data saved to {file_path}")
+            # Save the data as JSON
+            file_path = os.path.join(directory, filename)
+            with open(file_path, "w") as file:
+                json.dump(indicators, file, indent=4)
 
     def apply_indicators(self):
         indicators = {}  # To store indicators for each coin

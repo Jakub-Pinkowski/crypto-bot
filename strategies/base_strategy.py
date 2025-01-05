@@ -1,7 +1,7 @@
 import json
 import os
 from datetime import datetime
-from strategies.scoring_systems import scoring_system_1, scoring_system_2, scoring_system_3
+from strategies.scoring_systems import get_active_scoring_system
 
 def save_analysis_to_file(analysis, filename=None):
     """
@@ -16,12 +16,14 @@ def save_analysis_to_file(analysis, filename=None):
     """
     # Default file name with timestamp if none is provided
     if not filename:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         filename = f"analysis_{timestamp}.json"
 
+    daily_folder = None  # Placeholder for daily folder to use later
     # Ensure the analysis_data folder exists
     base_dir = os.path.dirname(os.path.dirname(__file__))  # Navigate to project root
-    directory = os.path.join(base_dir, "data", "analysis_data")
+    daily_folder = datetime.now().strftime("%Y-%m-%d")
+    directory = os.path.join(base_dir, "data", "analysis_data", daily_folder)
     os.makedirs(directory, exist_ok=True)  # Create the folder if it doesn't exist
 
     # Sort analysis by score (best to worst)
@@ -42,28 +44,15 @@ def analyze_coins(indicators):
 
     :param indicators: A dictionary containing all indicators for each coin.
 
-    :return: A dictionary containing actions for each coin and the reasoning.
+    Configure scoring function code added (call scoring functions).
+        Return dict comes separately tightly wrapped most conditions eliminated clarified
     """
     analyzed_coins = {}
     rankings = []
 
-    # Define variables for the scoring system
-    score_threshold = 2.0
-    scoring_function = scoring_system_1
-
     for coin, coin_indicators in indicators.items():
-        # Extract relevant indicators
-        rsi = coin_indicators["momentum"].get("RSI")
-        rsi_penalty = (70 - rsi) if rsi else 0  # Penalize overbought RSI
-
-        sma = coin_indicators["trend"].get("SMA")
-        current_price = coin_indicators["trend"].get("current_price", sma)  # Assume SMA if price is missing
-        sma_score = (current_price / sma - 1) if sma else 0  # Reward undervalued coins
-
-        macd_histogram = coin_indicators["trend"].get("MACD_histogram", 0)
-
         # Calculate composite score
-        score = scoring_function(rsi_penalty, sma_score, macd_histogram)
+        score = get_active_scoring_system(coin_indicators)
 
         # Append coin and score to rankings
         rankings.append((coin, score))
@@ -76,7 +65,10 @@ def analyze_coins(indicators):
         }
 
     # Rank coins by score
-    rankings.sort(key=lambda x: x[1], reverse=True)  # Higher score = more attractive
+    rankings.sort(key=lambda x: x[1], reverse=True)
+
+    # Define the threshold
+    score_threshold = 2.0
 
     # Decision-making based on rankings
     if len(rankings) > 1:
