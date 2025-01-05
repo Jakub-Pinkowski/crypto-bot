@@ -6,10 +6,10 @@ import numpy as np
 from indicators.trend_indicators import calculate_sma, calculate_ema, calculate_macd, calculate_ichimoku_cloud
 from indicators.momentum_indicators import  calculate_rsi, calculate_stochastic_oscillator, calculate_williams_r, calculate_cci
 from indicators.volatility_indicators import calculate_bollinger_bands, calculate_atr
+from utils.file_utils import save_data_to_file
 
 def calculate_indicators(coins_data):
     strategy = IncidatorBase(coins_data)
-    print("Calculating indicators...")
 
     # Apply all indicators to data and return only indicators
     indicators = strategy.apply_indicators()
@@ -239,33 +239,6 @@ class IncidatorBase:
         return {coin: convert_value(data) for coin, data in indicators.items()}
 
 
-    def save_indicators_to_file(self, indicators, filename=None):
-        """
-        Saves indicators to a JSON file in the indicators_data folder.
-
-        Parameters:
-            indicators (dict): The data to be saved.
-            filename (str, optional): File name for the saved data. Uses timestamp by default.
-
-        Returns:
-            Nothing
-        """
-        # Default file name with timestamp if none is provided
-        if not filename:
-            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            filename = f"indicators_{timestamp}.json"
-
-            # Ensure the indicators_data folder exists
-            base_dir = os.path.dirname(os.path.dirname(__file__))  # Navigate to project root
-            date_folder = datetime.now().strftime("%Y-%m-%d")
-            directory = os.path.join(base_dir, "data", "indicators_data", date_folder)
-            os.makedirs(directory, exist_ok=True)  # Ensure target directory exists
-
-            # Save the data as JSON
-            file_path = os.path.join(directory, filename)
-            with open(file_path, "w") as file:
-                json.dump(indicators, file, indent=4)
-
     def apply_indicators(self):
         indicators = {}  # To store indicators for each coin
 
@@ -307,7 +280,7 @@ class IncidatorBase:
         cleaned_indicators = self.clean_indicators(indicators)
 
         # Save indicators to a file
-        self.save_indicators_to_file(cleaned_indicators)
+        save_data_to_file(cleaned_indicators, "indicators_data", "indicators")
 
         # Return the cleaned_indicators
         return cleaned_indicators
