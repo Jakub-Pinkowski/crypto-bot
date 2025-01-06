@@ -31,3 +31,5 @@ VOLATILITY_INDICATORS:
     WINDOW: 20  # Window for Bollinger Bands
     NUM_STD_DEV: 2  # Number of standard deviations for bandwidth
   ATR_WINDOW: 14  # Window for Average True Range calculation
+
+# Strategy

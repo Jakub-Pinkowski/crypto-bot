@@ -1,8 +1,7 @@
 from strategies.scoring_systems import calculate_score
 from utils.file_utils import save_data_to_file
 
-def analyze_coins(indicators):
-    analyzed_coins = {}
+def rank_coins(indicators):
     rankings = []
 
     for coin, coin_indicators in indicators.items():
@@ -10,55 +9,28 @@ def analyze_coins(indicators):
         score = calculate_score(coin_indicators)
 
         # Append coin and score to rankings
-        rankings.append((coin, score))
+        rankings.append({"coin": coin, "score": score})
 
-        # Default action for this coin
-        analyzed_coins[coin] = {
-            "action": "HOLD",  # Default action unless decided otherwise
-            "reason": [],
-            "score": score  # Include score for transparency
-        }
+    # Rank coins by score in descending order
+    rankings.sort(key=lambda x: x["score"], reverse=True)
 
-    # Rank coins by score
-    rankings.sort(key=lambda x: x[1], reverse=True)
+    return rankings
 
-    # Define the threshold
-    score_threshold = 2.0
+def analyze_coins(indicators):
+    # Get the sorted rankings
+    ranked_coins = rank_coins(indicators)
 
-    # Decision-making based on rankings
-    if len(rankings) > 1:
-        best_coin, best_score = rankings[0]
-        worst_coin, worst_score = rankings[-1]
+    # Identify coin to buy (highest score) and coin to sell (lowest score)
+    coin_to_buy = ranked_coins[0] if ranked_coins else None  # Highest score
+    coin_to_sell = ranked_coins[-1] if ranked_coins else None  # Lowest score
 
-        # Check if the score difference exceeds the threshold
-        score_gap = best_score - worst_score
-        if score_gap >= score_threshold:
-            # Signal to buy the most attractive coin
-            analyzed_coins[best_coin]["action"] = "BUY"
-            analyzed_coins[best_coin]["reason"].append(
-                f"Highest attractiveness score ({best_score:.2f})."
-            )
+    # Consolidate highest and lowest score coins into coins_to_trade
+    coins_to_trade = {
+        "coin_to_buy": coin_to_buy,
+        "coin_to_sell": coin_to_sell
+    }
 
-            # Signal to sell the least attractive coin
-            analyzed_coins[worst_coin]["action"] = "SELL"
-            analyzed_coins[worst_coin]["reason"].append(
-                f"Lowest attractiveness score ({worst_score:.2f})."
-            )
-        else:
-            # If the score gap is too small, hold the portfolio
-            for coin in analyzed_coins:
-                analyzed_coins[coin]["action"] = "HOLD"
-                analyzed_coins[coin]["reason"].append(
-                    f"Score difference too small ({score_gap:.2f}), no significant action taken."
-                )
-    else:
-        # If there's only one coin in the portfolio, no trading can occur
-        for coin in analyzed_coins:
-            analyzed_coins[coin]["action"] = "HOLD"
-            analyzed_coins[coin]["reason"].append("Only one coin available, holding.")
+    # Save the ranked coins
+    save_data_to_file(ranked_coins, "analysis", "ranked_coins")  # Save rankings
 
-    # Sort analysis by score (best to worst) before saving
-    sorted_analysis = dict(sorted(analyzed_coins.items(), key=lambda item: item[1]["score"], reverse=True))
-    save_data_to_file(sorted_analysis, "analysis", "analysis")
-
-    return analyzed_coins
+    return coins_to_trade

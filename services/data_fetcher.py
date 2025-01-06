@@ -14,7 +14,7 @@ def get_coins_data():
     coins_data = fetch_coins_data(all_symbols_data, potential_coins)
 
     # Save coins data to a file
-    save_data_to_file(coins_data, "market_data", "coins_data")
+    save_data_to_file(coins_data, "market", "coins_data")
 
     return coins_data
 
