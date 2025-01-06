@@ -1,14 +1,7 @@
-import yaml
-import os
 from services.binance_auth import client
-from utils.file_utils import save_data_to_file
+from utils.file_utils import save_data_to_file, load_config_values
 
-config_path = os.path.join("config", "config.yaml")
-with open(config_path, "r") as file:
-    config = yaml.safe_load(file)
-
-PRICE_CHANGE_THRESHOLD = config["PRICE_CHANGE_THRESHOLD"]
-PRICE_RANGE_VOLATILITY_THRESHOLD = config["PRICE_RANGE_VOLATILITY_THRESHOLD"]
+config = load_config_values("PRICE_CHANGE_THRESHOLD", "PRICE_RANGE_VOLATILITY_THRESHOLD")
 
 def get_coins_data():
     # Fetch general symbols data
