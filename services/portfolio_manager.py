@@ -31,9 +31,9 @@ def extract_balance(wallet_info):
 
             wallet_balance.append(asset_info)
 
-    # Sort balances by value and then alphabetically for those with no value
+    # Sort balances by value in descending order
     wallet_balance.sort(
-        key=lambda balance: (-balance.get('value_in_usdt', 0), balance['asset'])
+        key=lambda balance: -balance['value_in_usdt']
     )
 
     return wallet_balance
