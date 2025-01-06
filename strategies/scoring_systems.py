@@ -24,7 +24,6 @@ def calculate_score(indicators):
 def scoring_system_1(indicators):
     rsi_score = indicators['momentum']['RSI'] * 1.2
     sma_score_weighted = indicators['trend']['SMA'] * -1.8
-    # Check for MACD_histogram and provide fallback
     macd_histogram = indicators['trend'].get('MACD_histogram', 0)
     macd_score = macd_histogram * 2.5
     raw_score = rsi_score + sma_score_weighted + macd_score
