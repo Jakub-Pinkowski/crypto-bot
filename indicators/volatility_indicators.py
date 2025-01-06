@@ -1,5 +1,9 @@
 import pandas as pd
 
+from utils.file_utils import load_config_values
+
+config = load_config_values("VOLATILITY_INDICATORS")
+
 def calculate_bollinger_bands(prices, window=20, num_std_dev=2):
     if not prices or len(prices) < window:
         return None
@@ -38,16 +42,20 @@ def calculate_volatility_indicators(high_prices, low_prices, close_prices):
     indicators = {}
     try:
         # Bollinger Bands
-        indicators['BollingerBands'] = calculate_bollinger_bands(close_prices)
+        bollinger_config = config['VOLATILITY_INDICATORS']['BOLLINGER_BANDS']
+        bollinger_window = bollinger_config['WINDOW']
+        num_std_dev = bollinger_config['NUM_STD_DEV']
+        indicators['BollingerBands'] = calculate_bollinger_bands(close_prices, bollinger_window, num_std_dev)
 
         # Average True Range (ATR)
-        atr_period = 14
-        indicators['ATR'] = calculate_atr(high_prices, low_prices, close_prices, atr_period)
+        atr_window = config['VOLATILITY_INDICATORS']['ATR_WINDOW']
+        indicators['ATR'] = calculate_atr(high_prices, low_prices, close_prices, atr_window)
 
     except Exception as e:
-        print(f"Error in calculating advanced indicators: {e}")
+        print(f"Error in calculating volatility indicators: {e}")
 
     return indicators
+
 
 def simplify_volatility_indicators(volatility_indicators, close_prices):
     simplified = {}

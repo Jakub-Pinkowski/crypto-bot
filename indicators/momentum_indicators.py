@@ -1,4 +1,7 @@
 import pandas as pd
+from utils.file_utils import load_config_values
+
+config = load_config_values("MOMENTUM_INDICATORS")
 
 def calculate_rsi(prices, window=14):
     if not prices or len(prices) < window:
@@ -61,23 +64,25 @@ def calculate_momentum_indicators(high_prices, low_prices, close_prices):
     indicators = {}
     try:
         # Relative Strength Index (RSI)
-        rsi_period = 14
+        rsi_period = config['MOMENTUM_INDICATORS']['RSI_WINDOW']
         indicators['RSI'] = calculate_rsi(close_prices, rsi_period)
 
         # Stochastic Oscillator
-        stochastic_window = 14
+        stochastic_config = config['MOMENTUM_INDICATORS']['STOCHASTIC']
+        stochastic_window = stochastic_config['WINDOW']
+        smooth_window = stochastic_config['SMOOTH_WINDOW']
         indicators['StochasticOscillator'] = calculate_stochastic_oscillator(
-            high_prices, low_prices, close_prices, stochastic_window
+            high_prices, low_prices, close_prices, stochastic_window, smooth_window
         )
 
         # Williams %R
-        williams_r_window = 14
+        williams_r_window = config['MOMENTUM_INDICATORS']['WILLIAMS_R_WINDOW']
         indicators['Williams%R'] = calculate_williams_r(
             high_prices, low_prices, close_prices, williams_r_window
         )
 
         # Commodity Channel Index (CCI)
-        cci_window = 20
+        cci_window = config['MOMENTUM_INDICATORS']['CCI_WINDOW']
         indicators['CCI'] = calculate_cci(
             high_prices, low_prices, close_prices, cci_window
         )
@@ -86,6 +91,7 @@ def calculate_momentum_indicators(high_prices, low_prices, close_prices):
         print(f"Error in calculating momentum indicators: {e}")
 
     return indicators
+
 
 def simplify_momentum_indicators(momentum_indicators):
     simplified = {}
