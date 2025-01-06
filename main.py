@@ -14,4 +14,4 @@ if __name__ == "__main__":
     coins_to_trade = analyze_coins(coins_indicators)
 
     # Make transactions
-    make_transactions(coins_to_trade, wallet_balance)
+    make_transactions(coins_to_trade, wallet_balance, coins_data)
