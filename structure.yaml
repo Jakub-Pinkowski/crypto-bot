@@ -7,6 +7,7 @@ crypto_bot/
 │   ├── indicators_data/          # Indicators for analysis
 │   ├── logs/                     # Logs generated during runtime
 │   ├── market_data/              # Raw market data for analysis 
+│   ├── wallet_data/              # Wallet info
 ├── indicators/
 │   ├── __init__.py               
 │   ├── indicator_base.py         # Base class for indicators

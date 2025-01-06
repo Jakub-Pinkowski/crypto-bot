@@ -9,14 +9,13 @@ logs/
 
 # Config files
 config/secrets.yaml
-config/*.yaml
 
 # Data files
 data/analysis_data/
 data/indicators_data/
 data/logs/
 data/market_data/
-*.sqlite3
+data/wallet_data/
 
 # Testing/coverage results
 htmlcov/
