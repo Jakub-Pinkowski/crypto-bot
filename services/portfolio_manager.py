@@ -38,7 +38,7 @@ def extract_balance(wallet_info):
 
     return wallet_balance
 
-def fetch_wallet():
+def fetch_wallet_balance():
     # Fetch wallet info
     wallet_info = client.account()
 

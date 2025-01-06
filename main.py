@@ -1,7 +1,7 @@
 from services.data_fetcher import get_coins_data
 from indicators.indicator_base import calculate_indicators
 from strategies.base_strategy import analyze_coins
-from services.portfolio_manager import fetch_wallet
+from services.portfolio_manager import fetch_wallet_balance
 
 if __name__ == "__main__":
     # # Fetch coins data
@@ -14,4 +14,4 @@ if __name__ == "__main__":
     # analyzed_coins = analyze_coins(coins_indicators)
     #
     # # Fetch the wallet
-    wallet_balance = fetch_wallet()
+    wallet_balance = fetch_wallet_balance()
