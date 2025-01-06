@@ -11,11 +11,11 @@ logs/
 config/secrets.yaml
 
 # Data files
-data/analysis_data/
-data/indicators_data/
+data/analysis/
+data/indicators/
 data/logs/
-data/market_data/
-data/wallet_data/
+data/market/
+data/wallet/
 
 # Testing/coverage results
 htmlcov/

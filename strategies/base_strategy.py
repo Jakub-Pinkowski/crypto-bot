@@ -59,6 +59,6 @@ def analyze_coins(indicators):
 
     # Sort analysis by score (best to worst) before saving
     sorted_analysis = dict(sorted(analyzed_coins.items(), key=lambda item: item[1]["score"], reverse=True))
-    save_data_to_file(sorted_analysis, "analysis_data", "analysis")
+    save_data_to_file(sorted_analysis, "analysis", "analysis")
 
     return analyzed_coins

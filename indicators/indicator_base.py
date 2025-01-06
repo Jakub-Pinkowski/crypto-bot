@@ -13,7 +13,7 @@ def calculate_indicators(coins_data):
     cleaned_indicators = clean_indicators(indicators)
 
     # Save indicators to a file
-    save_data_to_file(cleaned_indicators, "indicators_data", "indicators")
+    save_data_to_file(cleaned_indicators, "indicators", "indicators")
 
     # Return the cleaned_indicators
     return cleaned_indicators
