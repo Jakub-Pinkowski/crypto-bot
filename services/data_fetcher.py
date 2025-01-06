@@ -1,9 +1,14 @@
+import yaml
+import os
 from services.binance_auth import client
 from utils.file_utils import save_data_to_file
 
-# Define constants for filtering
-PRICE_CHANGE_THRESHOLD = 10.0  # Minimum percentage price change (absolute)
-PRICE_RANGE_VOLATILITY_THRESHOLD = 0.1  # Minimum range volatility in %
+config_path = os.path.join("config", "config.yaml")
+with open(config_path, "r") as file:
+    config = yaml.safe_load(file)
+
+PRICE_CHANGE_THRESHOLD = config["PRICE_CHANGE_THRESHOLD"]
+PRICE_RANGE_VOLATILITY_THRESHOLD = config["PRICE_RANGE_VOLATILITY_THRESHOLD"]
 
 def get_coins_data():
     # Fetch general symbols data
@@ -43,8 +48,8 @@ def fetch_all_symbols_data():
 
 def filter_potential_coins(all_symbols_data):
     # Define filter thresholds
-    price_change_threshold = PRICE_CHANGE_THRESHOLD
-    price_range_volatility_threshold = PRICE_RANGE_VOLATILITY_THRESHOLD
+    price_change_threshold = config["PRICE_CHANGE_THRESHOLD"]
+    price_range_volatility_threshold = config["PRICE_RANGE_VOLATILITY_THRESHOLD"]
 
     # Extract relevant data from input
     symbols = all_symbols_data["exchange_info"]["symbols"]
