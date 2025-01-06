@@ -2,6 +2,12 @@ from utils.file_utils import save_data_to_file, load_config_values
 
 config = load_config_values("ORDER_VALUE")
 
+def check_coin_balance(wallet_balance, coin):
+    for asset in wallet_balance:
+        if asset['asset'] == coin:
+            return asset  # Return the full asset details
+    return None
+
 def buy_coin_with_usdt(coin_to_buy, amount_to_use):
 
     # TODO: Replace this with API call or actual selling logic
@@ -10,11 +16,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use):
 
 def sell_coin_for_usdt(coin_to_sell, wallet_balance, amount_to_use):
     # Find the coin_to_sell in the wallet
-    coin_balance = None
-    for asset in wallet_balance:
-        if asset['asset'] == coin_to_sell:
-            coin_balance = asset  # Full asset details
-            break
+    coin_balance = check_coin_balance(wallet_balance, coin_to_sell)
 
     if not coin_balance:
         print(f"{coin_to_sell} not found in wallet. Cannot sell.")
@@ -48,11 +50,8 @@ def make_transactions(coins_to_trade, wallet_balance):
     coin_to_sell = coins_to_trade['coin_to_sell']['coin']
 
     # Check if enough USDT is available in the wallet
-    usdt_balance = 0
-    for asset in wallet_balance:
-        if asset['asset'] == 'USDT':
-            usdt_balance = asset['free']  # Get the free balance
-            break
+    usdt_balance_details = check_coin_balance(wallet_balance, 'USDT')
+    usdt_balance = usdt_balance_details['free'] if usdt_balance_details else 0
 
     print(f"Current USDT balance: {usdt_balance}")
 
