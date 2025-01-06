@@ -14,4 +14,4 @@ if __name__ == "__main__":
     # analyzed_coins = analyze_coins(coins_indicators)
     #
     # # Fetch the wallet
-    wallet = fetch_wallet()
+    wallet_balance = fetch_wallet()

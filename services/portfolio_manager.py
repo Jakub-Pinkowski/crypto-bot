@@ -1,8 +1,9 @@
 from services.binance_auth import client
 from utils.file_utils import save_data_to_file
 
+def extract_balance(wallet_info):
+    wallet_balance = []
 
-def clean_wallet(wallet_info):
     # Remove zero balances
     wallet_info['balances'] = [
         balance for balance in wallet_info['balances']
@@ -14,31 +15,37 @@ def clean_wallet(wallet_info):
 
     # Add USDT values and handle USDT as a special case
     for balance in wallet_info['balances']:
-        if balance['asset'] == "USDT":
-            balance['value_in_usdt'] = float(balance['free']) + float(balance['locked'])
-        else:
-            symbol = f"{balance['asset']}USDT"
-            if symbol in prices:
-                balance['price_in_usdt'] = prices[symbol]
-                balance['value_in_usdt'] = float(balance['free']) * balance['price_in_usdt'] + float(
-                    balance['locked']) * balance['price_in_usdt']
+        symbol = f"{balance['asset']}USDT"
+        if symbol in prices or balance['asset'] == "USDT":  # Ensure USDT exists in symbol or is USDT
+            asset_info = {
+                'asset': balance['asset'],
+                'free': float(balance['free']),
+                'locked': float(balance['locked']),
+            }
+            if balance['asset'] == "USDT":
+                asset_info['value_in_usdt'] = asset_info['free'] + asset_info['locked']
+            else:
+                asset_info['price_in_usdt'] = prices[symbol]
+                asset_info['value_in_usdt'] = asset_info['free'] * asset_info['price_in_usdt'] + \
+                                              asset_info['locked'] * asset_info['price_in_usdt']
+
+            wallet_balance.append(asset_info)
 
     # Sort balances by value and then alphabetically for those with no value
-    wallet_info['balances'].sort(
+    wallet_balance.sort(
         key=lambda balance: (-balance.get('value_in_usdt', 0), balance['asset'])
     )
 
-    return wallet_info
-
+    return wallet_balance
 
 def fetch_wallet():
     # Fetch wallet info
     wallet_info = client.account()
 
-    # Clean the wallet data
-    wallet_info = clean_wallet(wallet_info)
+    # Extract the wallet's balance
+    wallet_balance = extract_balance(wallet_info)
 
     # Save the wallet data
-    save_data_to_file(wallet_info, "wallet_data", "wallet")
+    save_data_to_file(wallet_balance, "wallet_data", "wallet_balance")
 
     return wallet_info
