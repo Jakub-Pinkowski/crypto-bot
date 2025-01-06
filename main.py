@@ -1,6 +1,7 @@
 from services.data_fetcher import get_coins_data
 from indicators.indicator_base import calculate_indicators
 from strategies.base_strategy import analyze_coins
+from order_execution.executor_base import make_transactions
 
 if __name__ == "__main__":
     # Fetch coins data and wallet balance
@@ -11,3 +12,6 @@ if __name__ == "__main__":
 
     # Analyze the indicators for each coin
     coins_to_trade = analyze_coins(coins_indicators)
+
+    # Make transactions
+    make_transactions(coins_to_trade, wallet_balance)

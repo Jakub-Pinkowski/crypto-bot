@@ -32,4 +32,6 @@ VOLATILITY_INDICATORS:
     NUM_STD_DEV: 2  # Number of standard deviations for bandwidth
   ATR_WINDOW: 14  # Window for Average True Range calculation
 
-# Strategy
+# Order execution
+ORDER_VALUE: 10.0 # Order value for the transactions
+
