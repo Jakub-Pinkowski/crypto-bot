@@ -48,4 +48,4 @@ def fetch_wallet_balance():
     # Save the wallet data
     save_data_to_file(wallet_balance, "wallet", "wallet_balance")
 
-    return wallet_info
+    return wallet_balance

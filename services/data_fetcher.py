@@ -1,4 +1,5 @@
 from services.binance_auth import client
+from services.portfolio_manager import fetch_wallet_balance
 from utils.file_utils import save_data_to_file, load_config_values
 
 config = load_config_values("PRICE_CHANGE_THRESHOLD", "PRICE_RANGE_VOLATILITY_THRESHOLD")
@@ -10,13 +11,20 @@ def get_coins_data():
     # Filter for potential coins
     potential_coins = filter_potential_coins(all_symbols_data)
 
+    # Fetch my own coins
+    wallet_balance = fetch_wallet_balance()
+    wallet_coins = {item['asset'] for item in wallet_balance}
+
+    # Combine coins into one variable
+    potential_and_wallet_coins = potential_coins.union(wallet_coins)
+
     # Fetch detailed data for filtered coins
-    coins_data = fetch_coins_data(all_symbols_data, potential_coins)
+    coins_data = fetch_coins_data(all_symbols_data, potential_and_wallet_coins)
 
     # Save coins data to a file
     save_data_to_file(coins_data, "market", "coins_data")
 
-    return coins_data
+    return coins_data, wallet_balance
 
 def fetch_all_symbols_data():
     # Fetch exchange information (metadata for symbols)
@@ -73,7 +81,7 @@ def filter_potential_coins(all_symbols_data):
 
     return potential_coins
 
-def fetch_coins_data(all_symbols_data, potential_coins):
+def fetch_coins_data(all_symbols_data, potential_and_wallet_coins):
     coins_data = {}
 
     # Extract data from all_symbols_data
@@ -82,7 +90,13 @@ def fetch_coins_data(all_symbols_data, potential_coins):
     prices = {price["symbol"]: float(price["price"]) for price in all_symbols_data["prices"]}
     stats = {stat["symbol"]: stat for stat in all_symbols_data["stats"] if stat["symbol"] in active_symbols}
 
-    for coin in potential_coins:
+    for coin in potential_and_wallet_coins:
+        if coin == "USDT":
+            continue
+
+        if coin == "BNB":
+            continue
+
         pairings = [symbol for symbol in symbols if symbol['baseAsset'] == coin or symbol['quoteAsset'] == coin]
         trading_pairs = [pair['symbol'] for pair in pairings if pair['symbol'] in active_symbols]
 
