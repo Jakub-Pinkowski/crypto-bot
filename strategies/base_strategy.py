@@ -1,4 +1,4 @@
-from strategies.scoring_systems import get_active_scoring_system
+from strategies.scoring_systems import calculate_score
 from utils.file_utils import save_data_to_file
 
 def analyze_coins(indicators):
@@ -7,7 +7,7 @@ def analyze_coins(indicators):
 
     for coin, coin_indicators in indicators.items():
         # Calculate composite score
-        score = get_active_scoring_system(coin_indicators)
+        score = calculate_score(coin_indicators)
 
         # Append coin and score to rankings
         rankings.append((coin, score))
