@@ -10,33 +10,39 @@ def check_coin_balance(wallet_balance, coin):
             return asset  # Return the full asset details
     return None
 
+def extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount_to_use):
+    # Fetch the current price
+    current_price = float(client.ticker_price(symbol=trading_pair)['price'])
+
+    # Extract LOT_SIZE filter
+    filters = coins_data[coin_to_buy]['pair_metadata'][trading_pair]['filters']
+    lot_size_filter = next((f for f in filters if f['filterType'] == 'LOT_SIZE'), None)
+    if not lot_size_filter:
+        raise ValueError(f"LOT_SIZE filter not found for trading pair {trading_pair}")
+
+    min_qty = float(lot_size_filter['minQty'])
+    max_qty = float(lot_size_filter['maxQty'])
+    step_size = float(lot_size_filter['stepSize'])
+    print(f"step_size: {step_size}")
+
+    # Calculate quantity and adjust to step size
+    quantity = amount_to_use / current_price
+    quantity = math.floor(quantity / step_size) * step_size
+
+    # Validate quantity
+    if not (min_qty <= float(quantity) <= max_qty):
+        raise ValueError(f"Quantity {quantity} out of range: [{min_qty}, {max_qty}]")
+
+    return quantity
+
 def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
     try:
         # Define the trading pair
         trading_pair = f"{coin_to_buy}USDT"
 
-        # Fetch the current price of the coin
-        current_price = float(client.ticker_price(symbol=trading_pair)['price'])
-
-        # Extract LOT_SIZE filter directly
-        filters = coins_data[coin_to_buy]['pair_metadata'][trading_pair]['filters']
-        lot_size_filter = next((f for f in filters if f['filterType'] == 'LOT_SIZE'), None)
-        if not lot_size_filter:
-            raise ValueError(f"LOT_SIZE filter not found for trading pair {trading_pair}")
-
-        min_qty = float(lot_size_filter['minQty'])
-        max_qty = float(lot_size_filter['maxQty'])
-        step_size = float(lot_size_filter['stepSize'])
-        print(f"step_size: {step_size}")
-
-        # Calculate quantity and adjust to step size
-        quantity = amount_to_use / current_price
-        quantity = math.floor(quantity / step_size) * step_size
-        print(f"Quantity: {quantity}")
-
-        # Validate quantity
-        if not (min_qty <= float(quantity) <= max_qty):
-            raise ValueError(f"Quantity {quantity} out of range: [{min_qty}, {max_qty}]")
+        # Calculate, process and validate quantity
+        quantity = extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount_to_use)
+        print(f"Validated Quantity: {quantity}")
 
         # Place an order
         # order = client.new_order(
@@ -46,7 +52,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         #     quantity=quantity
         # )
 
-        # Simulate success
+        # Print the summary
         print(f"Bought {quantity} of {coin_to_buy} for {amount_to_use} USDT at {current_price} USDT per unit.")
 
         # Save the transaction details to a file
