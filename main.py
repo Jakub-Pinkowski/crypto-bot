@@ -11,7 +11,7 @@ if __name__ == "__main__":
     coins_indicators = calculate_indicators(coins_data)
 
     # Analyze the indicators for each coin
-    coins_to_trade = analyze_coins(coins_indicators)
+    analyzed_coins = analyze_coins(coins_indicators, wallet_balance)
 
     # Make transactions
-    make_transactions(coins_to_trade, wallet_balance, coins_data)
+    make_transactions(analyzed_coins, wallet_balance, coins_data)

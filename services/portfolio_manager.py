@@ -36,6 +36,13 @@ def extract_balance(wallet_info):
         key=lambda balance: -balance['value_in_usdt']
     )
 
+    # Calculate the total portfolio value in USDT
+    total_value_in_usdt = sum(item['value_in_usdt'] for item in wallet_balance)
+
+    # Add percentage field
+    for item in wallet_balance:
+        item['percentage'] = round((item['value_in_usdt'] / total_value_in_usdt) * 100, 2)
+
     return wallet_balance
 
 def fetch_wallet_balance():

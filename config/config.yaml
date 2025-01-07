@@ -32,6 +32,9 @@ VOLATILITY_INDICATORS:
     NUM_STD_DEV: 2  # Number of standard deviations for bandwidth
   ATR_WINDOW: 14  # Window for Average True Range calculation
 
+# Strategy
+MAX_COIN_ALLOCATION: 0.20  # Maximum portfolio allocation per coin in %
+
 # Order execution
 ORDER_VALUE: 10.0 # Order value for the transactions
 

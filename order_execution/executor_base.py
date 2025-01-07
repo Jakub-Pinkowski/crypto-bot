@@ -113,7 +113,7 @@ def make_transactions(coins_to_trade, wallet_balance, coins_data):
     usdt_balance = usdt_balance_details['free'] if usdt_balance_details else 0
 
     # If there's enough USDT, proceed to buy the coin_to_buy
-    if usdt_balance <= amount_to_use:
+    if usdt_balance >= amount_to_use:
         buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data)
     else:
         sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance)
