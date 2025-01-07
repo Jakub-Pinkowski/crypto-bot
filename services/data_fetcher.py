@@ -10,6 +10,7 @@ def get_coins_data():
 
     # Filter for potential coins
     potential_coins = filter_potential_coins(all_symbols_data)
+    print(f"Potential coins: {potential_coins}")
 
     # Fetch my own coins
     wallet_balance = fetch_wallet_balance()
@@ -113,17 +114,13 @@ def fetch_coins_data(all_symbols_data, potential_and_wallet_coins):
         }
 
         # Initialize data collectors
-        order_books = {}
-        recent_trades = {}
+        # TODO: Shave it off as I'm only really using candlestick_data
         candlestick_data = {}
-        aggregated_trades = {}
 
         # Collect data for each pairing
         for pair in trading_pairs:
-            order_books[pair] = client.depth(symbol=pair, limit=100)
-            recent_trades[pair] = client.trades(symbol=pair, limit=100)
+            print(f"Fetching data for {pair}")
             candlestick_data[pair] = client.klines(symbol=pair, interval='1h', limit=24)
-            aggregated_trades[pair] = client.agg_trades(symbol=pair, limit=100)
 
         # Store everything in the coin data
         coins_data[coin] = {
@@ -135,10 +132,7 @@ def fetch_coins_data(all_symbols_data, potential_and_wallet_coins):
             "market_stats": {  # 24-hour market stats
                 pair: stats.get(pair, {}) for pair in trading_pairs
             },
-            "order_books": order_books,  # Order book data
-            "recent_trades": recent_trades,  # Recent trades
             "candlesticks": candlestick_data,  # Candlesticks (OHLC data)
-            "aggregated_trades": aggregated_trades,  # Aggregated trades
         }
 
     return coins_data

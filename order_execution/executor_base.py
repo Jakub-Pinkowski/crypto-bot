@@ -1,4 +1,4 @@
-from decimal import Decimal, ROUND_DOWN
+import math
 from services.binance_auth import client
 from utils.file_utils import save_data_to_file, load_config_values
 
@@ -11,49 +11,34 @@ def check_coin_balance(wallet_balance, coin):
     return None
 
 def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
-    # TODO: This whole thing is a mess, clean it up
-
     try:
-        # Assuming `client` is your API client and `trading_pair` is generated dynamically
+        # Define the trading pair
         trading_pair = f"{coin_to_buy}USDT"
 
-        # Get the price of the coin to buy
-        current_price_data = client.ticker_price(symbol=trading_pair)
-        current_price = float(current_price_data['price'])  # Get the price as a float
-        print(f"Current price of {coin_to_buy}: {current_price} USDT")
+        # Fetch the current price of the coin
+        current_price = float(client.ticker_price(symbol=trading_pair)['price'])
 
-        # Get LOT_SIZE filter
+        # Extract LOT_SIZE filter directly
         filters = coins_data[coin_to_buy]['pair_metadata'][trading_pair]['filters']
-        min_qty, max_qty, step_size = None, None, None
-        for filter_obj in filters:
-            if filter_obj['filterType'] == 'LOT_SIZE':
-                min_qty = float(filter_obj['minQty'])
-                max_qty = float(filter_obj['maxQty'])
-                step_size = float(filter_obj['stepSize'])
-                break
+        lot_size_filter = next((f for f in filters if f['filterType'] == 'LOT_SIZE'), None)
+        if not lot_size_filter:
+            raise ValueError(f"LOT_SIZE filter not found for trading pair {trading_pair}")
 
-        if step_size is None:
-            raise ValueError(f"Step size not found for trading pair {trading_pair}")
-
-        # Calculate initial quantity and adjust
-        quantity = amount_to_use / current_price
-
-        # Adjust quantity to be a multiple of step size
+        min_qty = float(lot_size_filter['minQty'])
+        max_qty = float(lot_size_filter['maxQty'])
+        step_size = float(lot_size_filter['stepSize'])
         print(f"step_size: {step_size}")
-        step_size_decimal = Decimal(str(step_size))  # Maintain precision
-        print(f"Step size_decimal: {step_size_decimal}")
-        quantity_decimal = Decimal(quantity).quantize(step_size_decimal, rounding=ROUND_DOWN)
-        quantity = float(quantity_decimal)  # Convert back to float for Binance API
 
-        # Correct floating-point artifacts (force it to match step_size precisely)
-        quantity = float(int(quantity / step_size) * step_size)
-        print(f"Adjusted quantity: {quantity}")
+        # Calculate quantity and adjust to step size
+        quantity = amount_to_use / current_price
+        quantity = math.floor(quantity / step_size) * step_size
+        print(f"Quantity: {quantity}")
 
         # Validate quantity
         if not (min_qty <= float(quantity) <= max_qty):
             raise ValueError(f"Quantity {quantity} out of range: [{min_qty}, {max_qty}]")
 
-
+        # Place an order
         # order = client.new_order(
         #     symbol=trading_pair,
         #     side='BUY',
