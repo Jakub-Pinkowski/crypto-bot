@@ -113,13 +113,11 @@ def fetch_coins_data(all_symbols_data, potential_and_wallet_coins):
             for pair in pairings if pair["symbol"] in active_symbols
         }
 
-        # Initialize data collectors
-        # TODO: Shave it off as I'm only really using candlestick_data
+        # Initialize data collector
         candlestick_data = {}
 
         # Collect data for each pairing
         for pair in trading_pairs:
-            print(f"Fetching data for {pair}")
             candlestick_data[pair] = client.klines(symbol=pair, interval='1h', limit=24)
 
         # Store everything in the coin data
