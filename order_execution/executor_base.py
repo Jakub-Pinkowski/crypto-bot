@@ -6,12 +6,13 @@ from utils.file_utils import save_data_to_file, load_config_values
 config = load_config_values("ORDER_VALUE")
 
 def check_coin_balance(wallet_balance, coin):
+    # Return just "free" balance, rest is irrelevant
     for asset in wallet_balance:
         if asset['asset'] == coin:
-            asset['free'] = float(asset['free'])  # Ensure 'free' balance is a float
-            asset['locked'] = float(asset['locked'])  # Ensure 'locked' balance is a float
-            asset['total'] = asset['free'] + asset['locked']  # Compute total balance
-            return asset
+            asset['free'] = float(asset['free'])  #
+            asset['locked'] = float(asset['locked'])
+            asset['total'] = asset['free'] + asset['locked']
+            return asset['free']
     raise ValueError(f"{coin} not found in wallet.")
 
 def extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount_to_use):
@@ -71,15 +72,14 @@ def sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance):
 
         # Find the coin_to_sell in the wallet
         coin_balance = check_coin_balance(wallet_balance, coin_to_sell)
-        free_balance = coin_balance['free']
 
         # Calculate the quantity to sell using the helper function
         quantity = extract_and_calculate_quantity(coin_to_sell, trading_pair, coins_data, amount_to_use)
 
         # Ensure quantity does not exceed available balance
-        if quantity > free_balance:
-            print(f"Insufficient {coin_to_sell} balance. Selling entire available balance: {free_balance}")
-            quantity = free_balance
+        if quantity > coin_balance:
+            print(f"Insufficient {coin_to_sell} balance. Selling entire available balance: {coin_balance}")
+            quantity = coin_balance
 
         print(f"Validated selling quantity: {quantity}")
 
@@ -99,7 +99,6 @@ def sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance):
     except Exception as e:
         # Handle and log any errors during the sell transaction
         print(f"An error occurred while trying to sell {coin_to_sell}: {e}")
-
 
 def make_transactions(coin_analysis, wallet_balance, coins_data):
     # Amount to use for buying a new coin (in USDT)
