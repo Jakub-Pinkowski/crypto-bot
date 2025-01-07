@@ -31,7 +31,7 @@ def determine_action(coin, score, wallet_balance):
         if coin_in_wallet:
             return "SELL"
         else:
-            return "DON'T BUY"
+            return "DO NOT BUY"
 
     # BUY condition: Always allow buying if the score is high
     if score > 70:
@@ -60,26 +60,10 @@ def analyze_coins(indicators, wallet_balance):
         action = determine_action(coin, score, wallet_balance)
         coin_analysis.append({"coin": coin, "score": score, "action": action})
 
-        # Store results
-        coin_analysis.append({
-            "coin": coin,
-            "score": score,
-            "action": action
-        })
-
     print(f"coin_analysis: {coin_analysis}")
 
-    # Identify coin to buy (highest score) and coin to sell (lowest score)
-    coin_to_buy = ranked_coins[0] if ranked_coins else None  # Highest score
-    coin_to_sell = ranked_coins[-1] if ranked_coins else None  # Lowest score
-
-    # Consolidate highest and lowest score coins into coins_to_trade
-    coins_to_trade = {
-        "coin_to_buy": coin_to_buy,
-        "coin_to_sell": coin_to_sell
-    }
-
     # Save the ranked coins
-    save_data_to_file(ranked_coins, "analysis", "ranked_coins")  # Save rankings
+    save_data_to_file(ranked_coins, "analysis", "ranked_coins")
+    save_data_to_file(coin_analysis, "analysis", "coin_analysis")
 
-    return coins_to_trade
+    return coin_analysis

@@ -1,5 +1,6 @@
 import math
 from services.binance_auth import client
+from services.portfolio_manager import fetch_wallet_balance
 from utils.file_utils import save_data_to_file, load_config_values
 
 config = load_config_values("ORDER_VALUE")
@@ -100,20 +101,39 @@ def sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance):
         print(f"An error occurred while trying to sell {coin_to_sell}: {e}")
 
 
-def make_transactions(coins_to_trade, wallet_balance, coins_data):
-    # Amount to use for buying the new coin (in USDT)
+def make_transactions(coin_analysis, wallet_balance, coins_data):
+    # Amount to use for buying a new coin (in USDT)
     amount_to_use = config['ORDER_VALUE']
 
-    # Extract relevant coins and their scores from the input
-    coin_to_buy = coins_to_trade['coin_to_buy']['coin']
-    coin_to_sell = coins_to_trade['coin_to_sell']['coin']
+    # Perform SELL actions
+    for analysis in coin_analysis:
+        coin = analysis['coin']
+        action = analysis['action']
 
-    # Check if enough USDT is available in the wallet
-    usdt_balance_details = check_coin_balance(wallet_balance, 'USDT')
-    usdt_balance = usdt_balance_details['free'] if usdt_balance_details else 0
+        if action == 'SELL':
+            print(f"Attempting to sell {coin}")
+            try:
+                sell_coin_for_usdt(coin, amount_to_use, coins_data, wallet_balance)
+            except Exception as e:
+                print(f"Error during selling {coin}: {str(e)}")
 
-    # If there's enough USDT, proceed to buy the coin_to_buy
-    if usdt_balance >= amount_to_use:
-        buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data)
-    else:
-        sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance)
+    # Fetch new wallet info
+    updated_wallet_balance = fetch_wallet_balance()
+    usdt_balance = check_coin_balance(updated_wallet_balance, 'USDT')
+    print(f"Updated USDT balance: {usdt_balance}")
+
+    # Perform BUY actions if sufficient USDT balance
+    for analysis in coin_analysis:
+        coin = analysis['coin']
+        action = analysis['action']
+
+        if action == 'BUY':
+            print(f"Attempting to buy {coin}")
+            # Ensure there's enough USDT to proceed with buying
+            if usdt_balance >= amount_to_use:
+                try:
+                    buy_coin_with_usdt(coin, amount_to_use, coins_data)
+                except Exception as e:
+                    print(f"Error during buying {coin}: {str(e)}")
+            else:
+                print(f"Insufficient USDT balance to buy {coin}. Available: {usdt_balance}, Required: {amount_to_use}")
