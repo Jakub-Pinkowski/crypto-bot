@@ -123,7 +123,4 @@ def simplify_trend_indicators(trend_indicators, close_prices):
                 "bullish" if simplified["MACD_current"] > simplified["MACD_signal"] else "bearish"
             )
 
-    else:
-        print(f"No valid MACD data for trend simplification.")
-
     return simplified

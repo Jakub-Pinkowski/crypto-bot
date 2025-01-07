@@ -49,8 +49,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         # Simulate success
         print(f"Bought {quantity} of {coin_to_buy} for {amount_to_use} USDT at {current_price} USDT per unit.")
 
-        print(f"Order details: {order}")
-        # Save the transaction result (ensure `save_transaction_result` is implemented)
+        # Save the transaction details to a file
         save_data_to_file(order, "transactions", "transaction")
     except Exception as e:
         # Handle and log any errors during the buy transaction
