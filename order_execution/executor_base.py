@@ -7,8 +7,11 @@ config = load_config_values("ORDER_VALUE")
 def check_coin_balance(wallet_balance, coin):
     for asset in wallet_balance:
         if asset['asset'] == coin:
-            return asset  # Return the full asset details
-    return None
+            asset['free'] = float(asset['free'])  # Ensure 'free' balance is a float
+            asset['locked'] = float(asset['locked'])  # Ensure 'locked' balance is a float
+            asset['total'] = asset['free'] + asset['locked']  # Compute total balance
+            return asset
+    raise ValueError(f"{coin} not found in wallet.")
 
 def extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount_to_use):
     # Fetch the current price
@@ -23,7 +26,6 @@ def extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount
     min_qty = float(lot_size_filter['minQty'])
     max_qty = float(lot_size_filter['maxQty'])
     step_size = float(lot_size_filter['stepSize'])
-    print(f"step_size: {step_size}")
 
     # Calculate quantity and adjust to step size
     quantity = amount_to_use / current_price
@@ -53,7 +55,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         # )
 
         # Print the summary
-        print(f"Bought {quantity} of {coin_to_buy} for {amount_to_use} USDT at {current_price} USDT per unit.")
+        print(f"Bought {quantity} of {coin_to_buy} for {amount_to_use} USDT.")
 
         # Save the transaction details to a file
         save_data_to_file(order, "transactions", "transaction")
@@ -61,31 +63,42 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         # Handle and log any errors during the buy transaction
         print(f"An error occurred while trying to buy {coin_to_buy}: {e}")
 
-def sell_coin_for_usdt(coin_to_sell, wallet_balance, amount_to_use):
-    # Find the coin_to_sell in the wallet
-    coin_balance = check_coin_balance(wallet_balance, coin_to_sell)
+def sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance):
+    try:
+        # Define the trading pair
+        trading_pair = f"{coin_to_sell}USDT"
 
-    if not coin_balance:
-        print(f"{coin_to_sell} not found in wallet. Cannot sell.")
-        return
+        # Find the coin_to_sell in the wallet
+        coin_balance = check_coin_balance(wallet_balance, coin_to_sell)
+        free_balance = coin_balance['free']
 
-    # Extract the free balance and its value in USDT
-    free_balance = coin_balance['free']
-    value_in_usdt = coin_balance.get('value_in_usdt', 0)  # Total value in USDT equivalent
+        # Calculate the quantity to sell using the helper function
+        quantity = extract_and_calculate_quantity(coin_to_sell, trading_pair, coins_data, amount_to_use)
 
-    # Calculate the amount to sell
-    if value_in_usdt >= amount_to_use:
-        # Sell exactly amount_to_use worth
-        print(f"Selling {amount_to_use} USDT worth of {coin_to_sell}.")
-        amount_of_coin = amount_to_use / coin_balance['price_in_usdt']  # Convert USDT to coin amount
-    else:
-        # Sell whatever balance is available
-        print(f"Insufficient balance. Selling entire {free_balance} of {coin_to_sell} (worth {value_in_usdt} USDT).")
-        amount_of_coin = free_balance
+        # Ensure quantity does not exceed available balance
+        if quantity > free_balance:
+            print(f"Insufficient {coin_to_sell} balance. Selling entire available balance: {free_balance}")
+            quantity = free_balance
 
-    # TODO: Replace this with API call or actual selling logic
-    print(f"Executing sell order: Sell {amount_of_coin} {coin_to_sell}.")
-    return amount_of_coin
+        print(f"Validated selling quantity: {quantity}")
+
+        # Place a sell order
+        # order = client.new_order(
+        #     symbol=trading_pair,
+        #     side='SELL',
+        #     type='MARKET',
+        #     quantity=quantity
+        # )
+
+        # Print the summary
+        print(f"Sold {quantity} of {coin_to_sell} for USDT")
+
+        # Save the transaction details to a file
+        save_data_to_file(order, "transactions", "transaction")
+    except Exception as e:
+        # Handle and log any errors during the sell transaction
+        print(f"An error occurred while trying to sell {coin_to_sell}: {e}")
+
 
 def make_transactions(coins_to_trade, wallet_balance, coins_data):
     # Amount to use for buying the new coin (in USDT)
@@ -100,7 +113,7 @@ def make_transactions(coins_to_trade, wallet_balance, coins_data):
     usdt_balance = usdt_balance_details['free'] if usdt_balance_details else 0
 
     # If there's enough USDT, proceed to buy the coin_to_buy
-    if usdt_balance >= amount_to_use:
+    if usdt_balance <= amount_to_use:
         buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data)
     else:
-        sell_coin_for_usdt(coin_to_sell, wallet_balance, amount_to_use)
+        sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance)
