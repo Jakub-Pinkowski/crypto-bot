@@ -26,10 +26,11 @@ def extract_ohlc_prices(coins_data, coin):
     low_prices = []
     close_prices = []
 
+    # Loop through all candlestick data for each pair and extract high, low, and close prices
     for pair, data_list in candlestick_data.items():
-        high_prices.extend([float(ohlcv[2]) for ohlcv in data_list])  # index 2 is the high price
-        low_prices.extend([float(ohlcv[3]) for ohlcv in data_list])  # index 3 is the low price
-        close_prices.extend([float(ohlcv[4]) for ohlcv in data_list])  # index 4 is the close price
+        high_prices.extend([float(ohlcv[2]) for ohlcv in data_list])
+        low_prices.extend([float(ohlcv[3]) for ohlcv in data_list])
+        close_prices.extend([float(ohlcv[4]) for ohlcv in data_list])
 
     return high_prices, low_prices, close_prices
 
@@ -37,21 +38,18 @@ def clean_indicators(indicators):
     def convert_value(value):
         # Convert NumPy scalars to Python types
         if isinstance(value, (np.float64, np.float32)):
-            return round(float(value), 4)  # Convert to Python float and round to 4 decimals
+            return round(float(value), 4)
         elif isinstance(value, (np.int64, np.int32, np.int_)):
-            return int(value)  # Convert to standard Python int
+            return int(value)
         elif isinstance(value, np.bool_):
-            return bool(value)  # Convert to standard Python bool
+            return bool(value)
         elif isinstance(value, dict):
-            # Recursively clean and round nested dictionaries
             return {k: convert_value(v) for k, v in value.items()}
         elif isinstance(value, list):
-            # Recursively clean lists
             return [convert_value(v) for v in value]
         elif isinstance(value, float):
-            return round(value, 4)  # Round Python native floats
+            return round(value, 4)
         else:
-            # Return the value as is if it doesn't need conversion or rounding
             return value
 
     # Clean the entire indicators dictionary
@@ -60,6 +58,7 @@ def clean_indicators(indicators):
 def apply_indicators(coins_data):
     indicators = {}
 
+    # Loop through each coin
     for coin, data in coins_data.items():
         try:
             # Extract high, low, close prices
