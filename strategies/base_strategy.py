@@ -49,7 +49,6 @@ def analyze_coins(indicators, wallet_balance):
     ranked_coins = rank_coins(indicators)
 
     # Initiate the variable
-    # TODO: Actually use it, for now we just print it
     coin_analysis = []
 
     for coin_data in ranked_coins:
