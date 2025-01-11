@@ -39,7 +39,6 @@ def test_extract_balance_with_valid_data():
         assert result[2]["value_in_usdt"] == 100.0
         assert result[2]["percentage"] == pytest.approx(2.78, rel=1e-2)
 
-
 def test_extract_balance_with_no_balances():
     wallet_info = {
         "balances": []  # Empty balances
@@ -53,7 +52,6 @@ def test_extract_balance_with_no_balances():
 
         # Assert that result is empty
         assert result == []
-
 
 @patch("services.portfolio_manager.client")
 def test_fetch_wallet_balance(mock_client):
