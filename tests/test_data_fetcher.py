@@ -92,7 +92,6 @@ def mock_client():
     with patch("services.data_fetcher.client") as mock_client:
         yield mock_client
 
-
 def test_fetch_all_symbols_data(mock_client):
     # Assign global mocks
     mock_client.exchange_info.return_value = MOCK_EXCHANGE_INFO
@@ -123,7 +122,6 @@ def test_fetch_all_symbols_data(mock_client):
         {"symbol": "ETHUSDT", "priceChangePercent": "3"},
     ]
 
-
 def test_filter_potential_coins():
     # Call the function under test
     result = filter_potential_coins(MOCK_ALL_SYMBOLS_DATA)
@@ -133,7 +131,6 @@ def test_filter_potential_coins():
 
     # Assertions
     assert result == expected_result, f"Expected {expected_result}, but got {result}"
-
 
 def test_fetch_coins_data(mock_client):
     # Assign global mocks
@@ -174,7 +171,6 @@ def test_fetch_coins_data(mock_client):
 
     assert eth_data["candlesticks"]["ETHUSDT"] == MOCK_CANDLESTICKS
 
-
 @patch("services.data_fetcher.fetch_all_symbols_data", return_value=MOCK_ALL_SYMBOLS_DATA)
 @patch("services.data_fetcher.filter_potential_coins", return_value={"BTC"})
 @patch("services.data_fetcher.fetch_wallet_balance", return_value=MOCK_WALLET_BALANCE)
@@ -187,20 +183,12 @@ def test_get_coins_data(
     # Call the function under test
     result, wallet_balance = get_coins_data()
 
-    # Assertions for fetch_all_symbols_data
+    # Assertions for each function
     mock_fetch_all_symbols_data.assert_called_once()
-
-    # Assertions for filter_potential_coins
     mock_filter_potential_coins.assert_called_once_with(MOCK_ALL_SYMBOLS_DATA)
-
-    # Assertions for fetch_wallet_balance
     mock_fetch_wallet_balance.assert_called_once()
-
-    # Assertions for fetch_coins_data
     expected_combined_coins = {"BTC", "ETH"}
     mock_fetch_coins_data.assert_called_once_with(MOCK_ALL_SYMBOLS_DATA, expected_combined_coins)
-
-    # Assertions for save_data_to_file
     mock_save_data_to_file.assert_called_once_with(MOCK_COINS_DATA, "market", "coins_data")
 
     # Validate returned data
