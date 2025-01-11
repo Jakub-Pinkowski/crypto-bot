@@ -6,8 +6,6 @@ import os
 
 # Configure logging
 config_logging(logging, logging.INFO)
-
-# Load environment variables from `.env` file
 load_dotenv()
 
 # Set up API keys

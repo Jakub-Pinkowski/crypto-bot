@@ -1,5 +1,4 @@
 from strategies.scoring_systems import calculate_score
-from utils.file_utils import save_data_to_file
 from utils.file_utils import save_data_to_file, load_config_values
 
 config = load_config_values("MAX_COIN_ALLOCATION")
@@ -42,7 +41,7 @@ def determine_action(coin, score, wallet_balance):
         return "HOLD"
 
     # Default: Don't buy if the coin isn't in the wallet and doesn't qualify for BUY
-    return "DON'T BUY"
+    return "DO NOT BUY"
 
 def analyze_coins(indicators, wallet_balance):
     # Get the sorted rankings
