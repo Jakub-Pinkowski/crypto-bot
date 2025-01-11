@@ -20,7 +20,6 @@ with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUE
         get_coins_data,
     )
 
-
 @pytest.fixture
 def mock_client():
     """Fixture to mock the 'client' object."""
