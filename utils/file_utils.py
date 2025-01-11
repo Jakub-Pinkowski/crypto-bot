@@ -21,7 +21,7 @@ def save_data_to_file(data, file_path, file_name):
         json.dump(data, file, indent=4)
 
 def load_config_values(*keys):
-    config_path = os.path.join("config", "config.yaml")  # Relative file path
+    config_path = os.path.join("config", "config.yaml")
 
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Config file not found at '{config_path}'")
