@@ -17,6 +17,9 @@ with patch("utils.file_utils.load_config_values", return_value=mock_config_value
 with patch("utils.file_utils.load_config_values", return_value=mock_config_values):
     from services.data_fetcher import fetch_coins_data
 
+with patch("utils.file_utils.load_config_values", return_value=mock_config_values):
+    from services.data_fetcher import get_coins_data
+
 
 @pytest.fixture
 def mock_client():
@@ -163,3 +166,80 @@ def test_fetch_coins_data(mock_client):
     assert eth_data["market_stats"]["ETHUSDT"]["priceChangePercent"] == "3"
     assert eth_data["market_stats"]["BTCETH"]["priceChangePercent"] == "2"
     assert eth_data["candlesticks"]["BTCETH"] == mock_candlesticks
+
+@patch("services.data_fetcher.fetch_all_symbols_data")
+@patch("services.data_fetcher.filter_potential_coins")
+@patch("services.data_fetcher.fetch_wallet_balance")
+@patch("services.data_fetcher.fetch_coins_data")
+@patch("services.data_fetcher.save_data_to_file")
+def test_get_coins_data(mock_save_data_to_file, mock_fetch_coins_data, mock_fetch_wallet_balance,
+                        mock_filter_potential_coins, mock_fetch_all_symbols_data):
+    # Mock data for fetch_all_symbols_data
+    mock_all_symbols_data = {
+        "exchange_info": {
+            "symbols": [
+                {"symbol": "BTCUSDT", "baseAsset": "BTC", "quoteAsset": "USDT"},
+                {"symbol": "ETHUSDT", "baseAsset": "ETH", "quoteAsset": "USDT"}
+            ]
+        },
+        "active_symbols": {"BTCUSDT", "ETHUSDT"},
+        "prices": [
+            {"symbol": "BTCUSDT", "price": "50000"},
+            {"symbol": "ETHUSDT", "price": "4000"}
+        ],
+        "stats": [
+            {"symbol": "BTCUSDT", "priceChangePercent": "5"},
+            {"symbol": "ETHUSDT", "priceChangePercent": "3"}
+        ]
+    }
+    mock_fetch_all_symbols_data.return_value = mock_all_symbols_data
+
+    # Mock data for filter_potential_coins
+    mock_filter_potential_coins.return_value = {"BTC"}
+
+    # Mock data for fetch_wallet_balance
+    mock_wallet_balance = [
+        {"asset": "BTC", "free": "0.5", "locked": "0.1"},
+        {"asset": "ETH", "free": "1.0", "locked": "0.0"}
+    ]
+    mock_fetch_wallet_balance.return_value = mock_wallet_balance
+
+    # Mock data for fetch_coins_data
+    mock_coins_data = {
+        "BTC": {
+            "pairings": ["BTCUSDT"],
+            "real_time_prices": {"BTCUSDT": 50000.0},
+            "market_stats": {"BTCUSDT": {"priceChangePercent": "5"}},
+            "candlesticks": {"BTCUSDT": []},
+        },
+        "ETH": {
+            "pairings": ["ETHUSDT"],
+            "real_time_prices": {"ETHUSDT": 4000.0},
+            "market_stats": {"ETHUSDT": {"priceChangePercent": "3"}},
+            "candlesticks": {"ETHUSDT": []},
+        }
+    }
+    mock_fetch_coins_data.return_value = mock_coins_data
+
+    # Call the function under test
+    result, wallet_balance = get_coins_data()
+
+    # Assertions for fetch_all_symbols_data
+    mock_fetch_all_symbols_data.assert_called_once()
+
+    # Assertions for filter_potential_coins
+    mock_filter_potential_coins.assert_called_once_with(mock_all_symbols_data)
+
+    # Assertions for fetch_wallet_balance
+    mock_fetch_wallet_balance.assert_called_once()
+
+    # Assertions for fetch_coins_data
+    expected_combined_coins = {"BTC", "ETH"}
+    mock_fetch_coins_data.assert_called_once_with(mock_all_symbols_data, expected_combined_coins)
+
+    # Assertions for save_data_to_file
+    mock_save_data_to_file.assert_called_once_with(mock_coins_data, "market", "coins_data")
+
+    # Validate returned data
+    assert result == mock_coins_data
+    assert wallet_balance == mock_wallet_balance
