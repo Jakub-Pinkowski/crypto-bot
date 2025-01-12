@@ -7,6 +7,11 @@ config = load_config_values("VOLATILITY_INDICATORS")
 def calculate_bollinger_bands(prices, window=20, num_std_dev=2):
     if not prices or len(prices) < window:
         return None
+
+    # Validate the window parameter
+    if not isinstance(window, int) or window < 1:
+        raise ValueError("window must be an integer >= 1")
+
     prices_series = pd.Series(prices)
     middle_band = prices_series.rolling(window=window).mean()
     std_dev = prices_series.rolling(window=window).std()
