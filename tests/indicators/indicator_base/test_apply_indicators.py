@@ -5,7 +5,6 @@ from tests.indicators.mock_data import MOCK_CONFIG_VALUES
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from indicators.indicator_base import apply_indicators
 
-# TODO: Implement tests
 def test_apply_indicators_success():
     # Mock coins_data for testing
     coins_data = {
