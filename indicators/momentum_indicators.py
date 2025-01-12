@@ -55,6 +55,10 @@ def calculate_williams_r(highs, lows, closes, window=14):
     if len(highs) < window or len(lows) < window or len(closes) < window:
         return None
 
+    # Validate the window parameter
+    if not isinstance(window, int) or window < 2:
+        raise ValueError("window must be an integer >= 2")
+
     highest_high = pd.Series(highs).rolling(window=window).max()
     lowest_low = pd.Series(lows).rolling(window=window).min()
     williams_r = ((highest_high - pd.Series(closes)) / (highest_high - lowest_low)) * -100
