@@ -51,15 +51,25 @@ def calculate_volatility_indicators(high_prices, low_prices, close_prices):
     indicators = {}
     try:
         # Bollinger Bands
-        bollinger_config = config['VOLATILITY_INDICATORS']['BOLLINGER_BANDS']
-        bollinger_window = bollinger_config['WINDOW']
-        num_std_dev = bollinger_config['NUM_STD_DEV']
-        indicators['BollingerBands'] = calculate_bollinger_bands(close_prices, bollinger_window, num_std_dev)
+        if 'BOLLINGER_BANDS' in config['VOLATILITY_INDICATORS']:
+            bollinger_config = config['VOLATILITY_INDICATORS']['BOLLINGER_BANDS']
+            bollinger_window = bollinger_config['WINDOW']
+            num_std_dev = bollinger_config['NUM_STD_DEV']
+
+            if len(close_prices) >= bollinger_window:
+                indicators['BollingerBands'] = calculate_bollinger_bands(close_prices, bollinger_window, num_std_dev)
+            else:
+                print(f"Not enough data for Bollinger Bands: Requires at least {bollinger_window} data points")
 
         # Average True Range (ATR)
         atr_window = config['VOLATILITY_INDICATORS']['ATR_WINDOW']
-        indicators['ATR'] = calculate_atr(high_prices, low_prices, close_prices, atr_window)
+        if len(high_prices) >= atr_window and len(low_prices) >= atr_window and len(close_prices) >= atr_window:
+            indicators['ATR'] = calculate_atr(high_prices, low_prices, close_prices, atr_window)
+        else:
+            print(f"Not enough data for ATR: Requires at least {atr_window} data points")
 
+    except KeyError as e:
+        print(f"Missing config key: {e}")
     except Exception as e:
         print(f"Error in calculating volatility indicators: {e}")
 
@@ -73,17 +83,30 @@ def simplify_volatility_indicators(volatility_indicators, close_prices):
     if "BollingerBands" in volatility_indicators:
         bands = volatility_indicators["BollingerBands"]
 
-        if "upper_band" in bands and "lower_band" in bands and "middle_band" in bands:
-            # Calculate the Bollinger Band width
-            simplified["Bollinger_width"] = bands["upper_band"].iloc[-1] - bands["lower_band"].iloc[-1]
+        # Check that the necessary Bollinger Bands components are available
+        if all(key in bands for key in ["upper_band", "lower_band", "middle_band"]):
+            # Safely extract the latest values for upper, lower, and middle bands
+            upper_band = bands["upper_band"]
+            lower_band = bands["lower_band"]
+            middle_band = bands["middle_band"]
 
-            # Check if the close price is above or below the bands
-            last_close = close_prices[-1]
-            simplified["close_above_upper"] = last_close > bands["upper_band"].iloc[-1]
-            simplified["close_below_lower"] = last_close < bands["lower_band"].iloc[-1]
+            # Ensure the series are not empty before accessing the last value
+            if not upper_band.empty and not lower_band.empty and not middle_band.empty:
+                # Calculate the Bollinger Band width
+                simplified["Bollinger_width"] = upper_band.iloc[-1] - lower_band.iloc[-1]
+
+                # Check if the close price is above or below the bands
+                last_close = close_prices[-1] if close_prices else None
+                if last_close is not None:
+                    simplified["close_above_upper"] = last_close > upper_band.iloc[-1]
+                    simplified["close_below_lower"] = last_close < lower_band.iloc[-1]
 
     # ATR (Average True Range): Include volatility signal
     if "ATR" in volatility_indicators:
-        simplified["ATR"] = volatility_indicators["ATR"].iloc[-1]
+        atr_series = volatility_indicators["ATR"]
+
+        # Ensure ATR series is not empty
+        if not atr_series.empty:
+            simplified["ATR"] = atr_series.iloc[-1]
 
     return simplified
