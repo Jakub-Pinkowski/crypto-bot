@@ -19,7 +19,8 @@ def calculate_indicators(coins_data):
     return cleaned_indicators
 
 def extract_ohlc_prices(coins_data, coin):
-    candlestick_data = coins_data[coin].get("candlesticks", {})
+    # Use `get` to avoid KeyError if coin is missing, return empty dictionary if coin not found
+    candlestick_data = coins_data.get(coin, {}).get("candlesticks", {})
 
     # Lists to store prices
     high_prices = []
