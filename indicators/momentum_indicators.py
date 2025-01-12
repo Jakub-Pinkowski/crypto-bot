@@ -91,9 +91,6 @@ def calculate_cci(highs, lows, closes, window=20):
 
 def calculate_momentum_indicators(high_prices, low_prices, close_prices):
     indicators = {}
-    print(f"High Prices: {high_prices}")
-    print(f"Low Prices: {low_prices}")
-    print(f"Close Prices: {close_prices}")
     try:
         # Relative Strength Index (RSI)
         rsi_period = config['MOMENTUM_INDICATORS']['RSI_WINDOW']
@@ -133,20 +130,30 @@ def simplify_momentum_indicators(momentum_indicators):
     simplified = {}
 
     # RSI: Extract the latest value and add thresholds
-    if "RSI" in momentum_indicators:
-        simplified["RSI"] = momentum_indicators["RSI"].iloc[-1]
-        simplified["RSI_signal"] = "oversold" if simplified["RSI"] < 30 else (
-            "overbought" if simplified["RSI"] > 70 else "neutral"
-        )
+    if "RSI" in momentum_indicators and momentum_indicators["RSI"] is not None:
+        rsi_series = momentum_indicators["RSI"]
+        if not rsi_series.empty:
+            simplified["RSI"] = rsi_series.iloc[-1]
+            # Determine RSI signal (oversold, overbought, or neutral)
+            if simplified["RSI"] < 30:
+                simplified["RSI_signal"] = "oversold"
+            elif simplified["RSI"] > 70:
+                simplified["RSI_signal"] = "overbought"
+            else:
+                simplified["RSI_signal"] = "neutral"
 
     # Stochastic Oscillator: Include overbought/oversold signals
-    if "StochasticOscillator" in momentum_indicators:
+    if "StochasticOscillator" in momentum_indicators and momentum_indicators["StochasticOscillator"] is not None:
         stochastic = momentum_indicators["StochasticOscillator"]
 
         if "%K" in stochastic and "%D" in stochastic:
             # Safely retrieve the latest value of %K and %D
-            simplified["Stochastic_%K"] = stochastic["%K"].iloc[-1] if not stochastic["%K"].empty else None
-            simplified["Stochastic_%D"] = stochastic["%D"].iloc[-1] if not stochastic["%D"].empty else None
+            simplified["Stochastic_%K"] = (
+                stochastic["%K"].iloc[-1] if not stochastic["%K"].empty else None
+            )
+            simplified["Stochastic_%D"] = (
+                stochastic["%D"].iloc[-1] if not stochastic["%D"].empty else None
+            )
 
             # Check if the latest %K indicates an overbought or oversold condition
             if simplified["Stochastic_%K"] is not None:
@@ -156,5 +163,27 @@ def simplify_momentum_indicators(momentum_indicators):
                     simplified["Stochastic_signal"] = "overbought"
                 else:
                     simplified["Stochastic_signal"] = "neutral"
+
+    # Williams %R: Add signal for overbought/oversold conditions
+    if "Williams%R" in momentum_indicators and momentum_indicators["Williams%R"] is not None:
+        williams_r_series = momentum_indicators["Williams%R"]
+        if not williams_r_series.empty:
+            simplified["Williams%R"] = williams_r_series.iloc[-1]
+            simplified["Williams%R_signal"] = (
+                "oversold" if simplified["Williams%R"] > -20
+                else "overbought" if simplified["Williams%R"] < -80
+                else "neutral"
+            )
+
+    # Commodity Channel Index (CCI)
+    if "CCI" in momentum_indicators and momentum_indicators["CCI"] is not None:
+        cci_series = momentum_indicators["CCI"]
+        if not cci_series.empty:
+            simplified["CCI"] = cci_series.iloc[-1]
+            simplified["CCI_signal"] = (
+                "overbought" if simplified["CCI"] > 100
+                else "oversold" if simplified["CCI"] < -100
+                else "neutral"
+            )
 
     return simplified

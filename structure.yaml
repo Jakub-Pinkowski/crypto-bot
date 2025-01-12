@@ -30,7 +30,7 @@ crypto_bot/
 │   ├── test_indicators.py        # Unit tests for indicators
 │   ├── test_order_execution.py   # Unit tests for order execution
 │   ├── test_services.py          # Unit tests for services
-│   ├── test_strategies.py        # Unit tests for strategies
+│   ├── test_utils.py             # Unit tests for utils
 ├── utils/
 │   ├── __init__.py               
 │   ├── logger.py                 # Logging utility
