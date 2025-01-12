@@ -3,7 +3,6 @@ from utils.file_utils import load_config_values
 
 config = load_config_values("TREND_INDICATORS")
 
-
 def calculate_sma(prices, window=14):
     if not prices:
         return None
