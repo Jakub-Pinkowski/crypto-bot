@@ -22,7 +22,7 @@ def calculate_ema(prices, window=14):
 
     # Validate the window parameter
     if not isinstance(window, int) or window < 1:
-        raise ValueError("span must be >= 1")
+        raise ValueError("window must be >= 1")
 
     prices_series = pd.Series(prices)
     return prices_series.ewm(span=window, adjust=False).mean()

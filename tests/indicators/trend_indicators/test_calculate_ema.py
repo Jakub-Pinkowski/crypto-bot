@@ -67,7 +67,7 @@ def test_calculate_ema_with_negative_window():
         calculate_ema(prices, window=window)
         assert False, "Expected an exception for negative window size"
     except ValueError as e:
-        assert str(e) == "span must be >= 1"
+        assert str(e) == "window must be >= 1"
 
 
 def test_calculate_ema_with_zero_window():
@@ -78,4 +78,4 @@ def test_calculate_ema_with_zero_window():
         calculate_ema(prices, window=window)
         assert False, "Expected an exception for zero window size"
     except ValueError as e:
-        assert str(e) == "span must be >= 1"
+        assert str(e) == "window must be >= 1"
