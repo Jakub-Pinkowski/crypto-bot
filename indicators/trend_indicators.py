@@ -5,12 +5,13 @@ config = load_config_values("TREND_INDICATORS")
 
 
 def calculate_sma(prices, window=14):
+    if not prices:
+        return None
+
     # Validate the window parameter
     if not isinstance(window, int) or window < 1:
         raise ValueError("window must be an integer >= 1")
 
-    if not prices:
-        return None
 
     prices_series = pd.Series(prices)
     return prices_series.rolling(window=window).mean()
@@ -18,6 +19,11 @@ def calculate_sma(prices, window=14):
 def calculate_ema(prices, window=14):
     if not prices:
         return None
+
+    # Validate the window parameter
+    if not isinstance(window, int) or window < 1:
+        raise ValueError("span must be >= 1")
+
     prices_series = pd.Series(prices)
     return prices_series.ewm(span=window, adjust=False).mean()
 
