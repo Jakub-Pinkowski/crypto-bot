@@ -69,6 +69,10 @@ def calculate_cci(highs, lows, closes, window=20):
     if len(highs) < window or len(lows) < window or len(closes) < window:
         return None
 
+    # Validate the window parameter
+    if not isinstance(window, int) or window < 2:
+        raise ValueError("window must be an integer >= 2")
+
     # Calculate Typical Price (TP) = (High + Low + Close) / 3
     typical_price = (pd.Series(highs) + pd.Series(lows) + pd.Series(closes)) / 3
 
