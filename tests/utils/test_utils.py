@@ -61,60 +61,42 @@ def test_save_data_to_file_creates_correct_file():
         written_content = "".join(call.args[0] for call in mock_file_handle.write.call_args_list)
         assert written_content == json.dumps(test_data, indent=4)
 
-# TODO: All of those below still need to be tested
-# def test_save_data_to_file_writes_correct_data():
-#     test_data = {"key": "value"}
-#     test_file_path = "test_path"
-#     test_file_name = "test_file"
-#
-#     with patch("os.makedirs"), patch("builtins.open", mock_open()) as mock_file, patch(
-#             "utils.file_utils.datetime") as mock_datetime:
-#         # Mock datetime to return a consistent timestamp
-#         mock_datetime.now.return_value = datetime(2023, 10, 31, 10, 30, 0)
-#         mock_datetime.now.strftime = datetime.now.strftime
-#
-#         save_data_to_file(test_data, test_file_path, test_file_name)
-#
-#         # Extract the file handle and ensure the correct data was written
-#         mock_file_handle = mock_file()
-#         mock_file_handle.write.assert_called_once_with(json.dumps(test_data, indent=4))
-#
-# def test_load_config_values_success():
-#     config = {
-#         "key1": "value1",
-#         "key2": "value2",
-#     }
-#
-#     # Mock the file existence and content
-#     with patch("builtins.open", mock_open(read_data=yaml.dump(config))) as mock_file, \
-#             patch("os.path.exists", return_value=True):
-#         # Call the function with keys
-#         result = load_config_values("key1", "key2")
-#
-#         # Verify the result matches our mock data
-#         assert result == {"key1": "value1", "key2": "value2"}
-#         mock_file.assert_called_once_with(os.path.join("config", "config.yaml"), "r")
-#
-# def test_load_config_values_file_not_found():
-#     # Mock the config file does not exist
-#     with patch("os.path.exists", return_value=False):
-#         with pytest.raises(FileNotFoundError, match="Config file not found at 'config/config.yaml'"):
-#             load_config_values("key1")
-#
-# def test_load_config_values_parse_error():
-#     # Mock a malformed YAML file
-#     with patch("builtins.open", mock_open(read_data="key1: value1:")) as mock_file, \
-#             patch("os.path.exists", return_value=True):
-#         with pytest.raises(yaml.YAMLError, match="Error while parsing the config file:"):
-#             load_config_values("key1")
-#
-# def test_load_config_values_missing_key():
-#     config = {
-#         "key1": "value1",
-#     }
-#
-#     # Mock the file existence and content
-#     with patch("builtins.open", mock_open(read_data=yaml.dump(config))) as mock_file, \
-#             patch("os.path.exists", return_value=True):
-#         with pytest.raises(KeyError, match="Key 'key2' is missing in the config file"):
-#             load_config_values("key1", "key2")
+def test_load_config_values_success():
+    config = {
+        "key1": "value1",
+        "key2": "value2",
+    }
+
+    # Mock the file existence and content
+    with patch("builtins.open", mock_open(read_data=yaml.dump(config))) as mock_file, \
+            patch("os.path.exists", return_value=True):
+        # Call the function with keys
+        result = load_config_values("key1", "key2")
+
+        # Verify the result matches our mock data
+        assert result == {"key1": "value1", "key2": "value2"}
+        mock_file.assert_called_once_with(os.path.join("config", "config.yaml"), "r")
+
+def test_load_config_values_file_not_found():
+    # Mock the config file does not exist
+    with patch("os.path.exists", return_value=False):
+        with pytest.raises(FileNotFoundError, match="Config file not found at 'config/config.yaml'"):
+            load_config_values("key1")
+
+def test_load_config_values_parse_error():
+    # Mock a malformed YAML file
+    with patch("builtins.open", mock_open(read_data="key1: value1:")) as mock_file, \
+            patch("os.path.exists", return_value=True):
+        with pytest.raises(yaml.YAMLError, match="Error while parsing the config file:"):
+            load_config_values("key1")
+
+def test_load_config_values_missing_key():
+    config = {
+        "key1": "value1",
+    }
+
+    # Mock the file existence and content
+    with patch("builtins.open", mock_open(read_data=yaml.dump(config))) as mock_file, \
+            patch("os.path.exists", return_value=True):
+        with pytest.raises(KeyError, match="Key 'key2' is missing in the config file"):
+            load_config_values("key1", "key2")
