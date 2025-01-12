@@ -114,28 +114,38 @@ def simplify_trend_indicators(trend_indicators, close_prices):
     simplified = {}
 
     # Extract the latest value for each trend indicator
-    if "SMA" in trend_indicators:
-        simplified["SMA"] = trend_indicators["SMA"].iloc[-1]  # Latest SMA value
+    if "SMA" in trend_indicators and trend_indicators["SMA"] is not None:
+        sma_series = trend_indicators["SMA"]
+        if not sma_series.empty:
+            simplified["SMA"] = sma_series.iloc[-1]  # Latest SMA value
 
-        # Check if close price is above or below the SMA
-        simplified["above_SMA"] = close_prices[-1] > simplified["SMA"]
+            # Check if close price is above or below the SMA
+            simplified["above_SMA"] = close_prices[-1] > simplified["SMA"]
 
-    if "EMA" in trend_indicators:
-        simplified["EMA"] = trend_indicators["EMA"].iloc[-1]  # Latest EMA value
+    if "EMA" in trend_indicators and trend_indicators["EMA"] is not None:
+        ema_series = trend_indicators["EMA"]
+        if not ema_series.empty:
+            simplified["EMA"] = ema_series.iloc[-1]  # Latest EMA value
 
     # MACD: Add signal direction (e.g., bullish or bearish crossover)
     if "MACD" in trend_indicators and trend_indicators["MACD"]:
         macd_data = trend_indicators["MACD"]
 
         # Safely extract MACD components
-        simplified["MACD_current"] = macd_data["macd_line"].iloc[-1] if "macd_line" in macd_data else None
-        simplified["MACD_signal"] = macd_data["signal_line"].iloc[-1] if "signal_line" in macd_data else None
-        simplified["MACD_histogram"] = macd_data["histogram"].iloc[-1] if "histogram" in macd_data else None
+        macd_line = macd_data.get("macd_line")
+        signal_line = macd_data.get("signal_line")
+        histogram = macd_data.get("histogram")
 
-        # Determine the trend based on MACD and Signal line values
-        if simplified["MACD_current"] and simplified["MACD_signal"]:
+        if macd_line is not None and signal_line is not None:
+            simplified["MACD_current"] = macd_line.iloc[-1]
+            simplified["MACD_signal"] = signal_line.iloc[-1]
+            simplified["MACD_histogram"] = histogram.iloc[-1] if histogram is not None else None
+
+            # Determine the trend based on MACD and Signal line values
             simplified["MACD_trend"] = (
                 "bullish" if simplified["MACD_current"] > simplified["MACD_signal"] else "bearish"
             )
+        else:
+            simplified["MACD_trend"] = None  # Handle missing MACD data
 
     return simplified
