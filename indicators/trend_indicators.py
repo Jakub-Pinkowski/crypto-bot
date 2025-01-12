@@ -80,26 +80,30 @@ def calculate_trend_indicators(high_prices, low_prices, close_prices):
     try:
         # Simple Moving Average (SMA)
         sma_period = config['TREND_INDICATORS']['SMA_WINDOW']
-        indicators['SMA'] = calculate_sma(close_prices, sma_period)
+        if len(close_prices) >= sma_period:
+            indicators['SMA'] = calculate_sma(close_prices, sma_period)
 
         # Exponential Moving Average (EMA)
         ema_period = config['TREND_INDICATORS']['EMA_WINDOW']
-        indicators['EMA'] = calculate_ema(close_prices, ema_period)
+        if len(close_prices) >= ema_period:
+            indicators['EMA'] = calculate_ema(close_prices, ema_period)
 
         # MACD
-        macd_config = config['TREND_INDICATORS']['MACD']  # Extract MACD configuration
+        macd_config = config['TREND_INDICATORS']['MACD']
         macd_short_window = macd_config['SHORT_WINDOW']
         macd_long_window = macd_config['LONG_WINDOW']
         macd_signal_window = macd_config['SIGNAL_WINDOW']
-        indicators['MACD'] = calculate_macd(close_prices, macd_short_window, macd_long_window, macd_signal_window)
+        if len(close_prices) >= macd_long_window:
+            indicators['MACD'] = calculate_macd(close_prices, macd_short_window, macd_long_window, macd_signal_window)
 
         # Calculate Ichimoku Cloud
-        ichimoku_config = config['TREND_INDICATORS']['ICHIMOKU']  # Extract Ichimoku configuration
+        ichimoku_config = config['TREND_INDICATORS']['ICHIMOKU']
         tenkan_window = ichimoku_config['TENKAN_WINDOW']
         kijun_window = ichimoku_config['KIJUN_WINDOW']
         senkou_b_window = ichimoku_config['SENKOU_B_WINDOW']
         senkou_shift = ichimoku_config['SENKOU_SHIFT']
-        indicators['Ichimoku'] = calculate_ichimoku_cloud(high_prices, low_prices, close_prices, tenkan_window, kijun_window, senkou_b_window, senkou_shift)
+        if len(high_prices) >= max(tenkan_window, kijun_window, senkou_b_window):
+            indicators['Ichimoku'] = calculate_ichimoku_cloud(high_prices, low_prices, close_prices, tenkan_window, kijun_window, senkou_b_window, senkou_shift)
 
     except Exception as e:
         print(f"Error in calculating basic indicators: {e}")
