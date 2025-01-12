@@ -1,7 +1,11 @@
 from strategies.scoring_systems import calculate_score
-from utils.file_utils import save_data_to_file, load_config_values
+from utils.file_utils import save_data_to_file
 
-config = load_config_values("MAX_COIN_ALLOCATION")
+# NOTE: Not config it for now
+# config = load_config_values("MAX_COIN_ALLOCATION")
+
+def is_coin_in_wallet(coin, wallet):
+    return any(entry["asset"] == coin and entry["free"] > 0 for entry in wallet)
 
 def rank_coins(indicators):
     rankings = []
@@ -17,9 +21,6 @@ def rank_coins(indicators):
     rankings.sort(key=lambda x: x["score"], reverse=True)
 
     return rankings
-
-def is_coin_in_wallet(coin, wallet):
-    return any(entry["asset"] == coin and entry["free"] > 0 for entry in wallet)
 
 def determine_action(coin, score, wallet_balance):
     # Check if the coin is in the wallet
