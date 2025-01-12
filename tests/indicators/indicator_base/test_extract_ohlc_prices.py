@@ -1,4 +1,3 @@
-import numpy as np
 from unittest.mock import patch
 from tests.indicators.mock_data import MOCK_CONFIG_VALUES
 
