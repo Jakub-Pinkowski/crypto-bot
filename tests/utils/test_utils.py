@@ -1,6 +1,5 @@
 import pytest
 from unittest.mock import patch, mock_open, MagicMock
-from datetime import datetime
 import os
 import json
 import yaml
@@ -85,7 +84,7 @@ def test_load_config_values_file_not_found():
 
 def test_load_config_values_parse_error():
     # Mock a malformed YAML file
-    with patch("builtins.open", mock_open(read_data="key1: value1:")) as mock_file, \
+    with patch("builtins.open", mock_open(read_data="key1: value1:")), \
             patch("os.path.exists", return_value=True):
         with pytest.raises(yaml.YAMLError, match="Error while parsing the config file:"):
             load_config_values("key1")
@@ -96,7 +95,7 @@ def test_load_config_values_missing_key():
     }
 
     # Mock the file existence and content
-    with patch("builtins.open", mock_open(read_data=yaml.dump(config))) as mock_file, \
+    with patch("builtins.open", mock_open(read_data=yaml.dump(config))), \
             patch("os.path.exists", return_value=True):
         with pytest.raises(KeyError, match="Key 'key2' is missing in the config file"):
             load_config_values("key1", "key2")
