@@ -26,35 +26,40 @@ def test_calculate_rsi_with_valid_data():
     # Check if the values are equal, but ignore NaNs at the start
     pd.testing.assert_series_equal(result, expected_rsi, check_like=True)
 
-# Test with an empty list of prices
+
 def test_calculate_rsi_with_empty_prices():
+    # Test with an empty list of prices
     prices = []
     window = 14
     result = calculate_rsi(prices, window=window)
     assert result is None
 
-# Test with a window size larger than the length of prices
+
 def test_calculate_rsi_with_window_larger_than_prices_length():
+    # Test with a window size larger than the length of prices
     prices = [44, 46, 47]
     window = 5
     result = calculate_rsi(prices, window=window)
     assert result is None  # Should return None because window size is larger than price data
 
-# Test with the default window size (14)
+
 def test_calculate_rsi_with_default_window():
+    # Test with the default window size (14)
     prices = [44, 46, 47, 45, 43, 42, 44, 45, 46, 47, 45, 44, 46, 47, 48]
     result = calculate_rsi(prices)  # Default window size of 14
     assert result is not None  # Check that we get a result, the length of the result should be the same as prices
 
-# Test with a window size of 1 (should return NaN)
+
 def test_calculate_rsi_with_window_one():
+    # Test with a window size of 1
     prices = [44, 46, 47, 45, 43, 42, 44, 45]
     window = 1
     result = calculate_rsi(prices, window=window)
     assert result.isna().all()  # The RSI for a window of 1 should be NaN for all points
 
-# Test with a negative window size
+
 def test_calculate_rsi_with_negative_window():
+    # Test with a negative window size
     prices = [44, 46, 47, 45, 43]
     window = -3
     try:
