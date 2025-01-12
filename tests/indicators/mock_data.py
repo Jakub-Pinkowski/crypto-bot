@@ -13,5 +13,21 @@ MOCK_CONFIG_VALUES = {
             "SENKOU_B_WINDOW": 52,  # Window for Senkou Span B (Leading Span B)
             "SENKOU_SHIFT": 26,  # Forward shift for Senkou spans
         }
+    },
+    "MOMENTUM_INDICATORS": {
+        "RSI_WINDOW": 14,  # Window for Relative Strength Index
+        "STOCHASTIC": {
+            "WINDOW": 14,  # Window for the Stochastic Oscillator
+            "SMOOTH_WINDOW": 3,  # Smoothing window for %K line
+        },
+        "WILLIAMS_R_WINDOW": 14,  # Window for Williams %R calculation
+        "CCI_WINDOW": 20,  # Window for Commodity Channel Index
+    },
+    "VOLATILITY_INDICATORS": {
+        "BOLLINGER_BANDS": {
+            "WINDOW": 20,  # Window for Bollinger Bands
+            "NUM_STD_DEV": 2,  # Number of standard deviations for bandwidth
+        },
+        "ATR_WINDOW": 14,  # Window for Average True Range calculation
     }
 }

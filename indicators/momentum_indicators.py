@@ -91,6 +91,9 @@ def calculate_cci(highs, lows, closes, window=20):
 
 def calculate_momentum_indicators(high_prices, low_prices, close_prices):
     indicators = {}
+    print(f"High Prices: {high_prices}")
+    print(f"Low Prices: {low_prices}")
+    print(f"Close Prices: {close_prices}")
     try:
         # Relative Strength Index (RSI)
         rsi_period = config['MOMENTUM_INDICATORS']['RSI_WINDOW']
