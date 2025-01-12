@@ -6,6 +6,11 @@ config = load_config_values("MOMENTUM_INDICATORS")
 def calculate_rsi(prices, window=14):
     if not prices or len(prices) < window:
         return None
+
+    # Validate the window parameter
+    if not isinstance(window, int) or window < 1:
+        raise ValueError("window must be an integer >= 1")
+
     prices_series = pd.Series(prices)
     delta = prices_series.diff()
 

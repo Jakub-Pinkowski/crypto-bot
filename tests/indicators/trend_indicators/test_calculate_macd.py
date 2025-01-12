@@ -21,7 +21,6 @@ def test_calculate_macd_with_valid_data():
     signal_line = macd_line.ewm(span=signal_window, adjust=False).mean()
     histogram = macd_line - signal_line
 
-    # Validate the returned components
     pd.testing.assert_series_equal(result['macd_line'], macd_line)
     pd.testing.assert_series_equal(result['signal_line'], signal_line)
     pd.testing.assert_series_equal(result['histogram'], histogram)

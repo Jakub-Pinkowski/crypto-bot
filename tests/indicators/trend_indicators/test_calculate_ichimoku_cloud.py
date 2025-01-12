@@ -17,20 +17,12 @@ def test_ichimoku_with_valid_data():
     lows_series = pd.Series(lows)
     closes_series = pd.Series(closes)
 
-    # Expected Tenkan-sen
+    # Expected values
     tenkan_sen = (highs_series.rolling(window=9).max() + lows_series.rolling(window=9).min()) / 2
-
-    # Expected Kijun-sen
     kijun_sen = (highs_series.rolling(window=26).max() + lows_series.rolling(window=26).min()) / 2
-
-    # Expected Senkou Span A
     senkou_span_a = ((tenkan_sen + kijun_sen) / 2).shift(26)
-
-    # Expected Senkou Span B
     senkou_span_b = ((highs_series.rolling(window=52).max() +
                       lows_series.rolling(window=52).min()) / 2).shift(26)
-
-    # Expected Chikou Span
     chikou_span = closes_series.shift(-26)
 
     # Validate results
@@ -61,23 +53,14 @@ def test_ichimoku_with_custom_parameters():
     lows_series = pd.Series(lows)
     closes_series = pd.Series(closes)
 
-    # Expected Tenkan-sen
+    # Expected values
     tenkan_sen = (highs_series.rolling(window=5).max() + lows_series.rolling(window=5).min()) / 2
-
-    # Expected Kijun-sen
     kijun_sen = (highs_series.rolling(window=10).max() + lows_series.rolling(window=10).min()) / 2
-
-    # Expected Senkou Span A
     senkou_span_a = ((tenkan_sen + kijun_sen) / 2).shift(10)
-
-    # Expected Senkou Span B
     senkou_span_b = ((highs_series.rolling(window=15).max() +
                       lows_series.rolling(window=15).min()) / 2).shift(10)
-
-    # Expected Chikou Span
     chikou_span = closes_series.shift(-10)
 
-    # Validate results
     pd.testing.assert_series_equal(result['tenkan_sen'], tenkan_sen)
     pd.testing.assert_series_equal(result['kijun_sen'], kijun_sen)
     pd.testing.assert_series_equal(result['senkou_span_a'], senkou_span_a)
@@ -105,23 +88,14 @@ def test_ichimoku_with_negative_values():
     lows_series = pd.Series(lows)
     closes_series = pd.Series(closes)
 
-    # Expected Tenkan-sen
+    # Expected values
     tenkan_sen = (highs_series.rolling(window=9).max() + lows_series.rolling(window=9).min()) / 2
-
-    # Expected Kijun-sen
     kijun_sen = (highs_series.rolling(window=26).max() + lows_series.rolling(window=26).min()) / 2
-
-    # Expected Senkou Span A
     senkou_span_a = ((tenkan_sen + kijun_sen) / 2).shift(26)
-
-    # Expected Senkou Span B
     senkou_span_b = ((highs_series.rolling(window=52).max() +
                       lows_series.rolling(window=52).min()) / 2).shift(26)
-
-    # Expected Chikou Span
     chikou_span = closes_series.shift(-26)
 
-    # Validate results
     pd.testing.assert_series_equal(result['tenkan_sen'], tenkan_sen)
     pd.testing.assert_series_equal(result['kijun_sen'], kijun_sen)
     pd.testing.assert_series_equal(result['senkou_span_a'], senkou_span_a)
@@ -139,23 +113,14 @@ def test_ichimoku_with_identical_values():
     lows_series = pd.Series(lows)
     closes_series = pd.Series(closes)
 
-    # Expected Tenkan-sen
+    # Expected values
     tenkan_sen = (highs_series.rolling(window=9).max() + lows_series.rolling(window=9).min()) / 2
-
-    # Expected Kijun-sen
     kijun_sen = (highs_series.rolling(window=26).max() + lows_series.rolling(window=26).min()) / 2
-
-    # Expected Senkou Span A
     senkou_span_a = ((tenkan_sen + kijun_sen) / 2).shift(26)
-
-    # Expected Senkou Span B
     senkou_span_b = ((highs_series.rolling(window=52).max() +
                       lows_series.rolling(window=52).min()) / 2).shift(26)
-
-    # Expected Chikou Span
     chikou_span = closes_series.shift(-26)
 
-    # Validate results
     pd.testing.assert_series_equal(result['tenkan_sen'], tenkan_sen)
     pd.testing.assert_series_equal(result['kijun_sen'], kijun_sen)
     pd.testing.assert_series_equal(result['senkou_span_a'], senkou_span_a)
@@ -168,4 +133,4 @@ def test_ichimoku_with_single_data_point():
     lows = [90]
     closes = [95]
     result = calculate_ichimoku_cloud(highs, lows, closes)
-    assert result is None  # Should return None due to insufficient data
+    assert result is None
