@@ -11,6 +11,7 @@ def check_coin_balance(wallet_balance, coin):
             return float(asset['free'])
     raise ValueError(f"{coin} notfound in wallet.")
 
+
 def extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount_to_use):
     # Fetch the current price
     current_price = float(client.ticker_price(symbol=trading_pair)['price'])
@@ -25,12 +26,18 @@ def extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount
     max_qty = float(lot_size_filter['maxQty'])
     step_size = float(lot_size_filter['stepSize'])
 
-    # Calculate quantity and adjust to step size
+    # Calculate quantity
     quantity = amount_to_use / current_price
+
+    # Ensure quantity is not below the minimum allowed quantity
+    if quantity < min_qty:
+        quantity = min_qty
+
+    # Round to the nearest step size
     quantity = math.floor(quantity / step_size) * step_size
 
     # Validate quantity
-    if not (min_qty <= float(quantity) <= max_qty):
+    if not (min_qty <= quantity <= max_qty):
         raise ValueError(f"Quantity {quantity} out of range: [{min_qty}, {max_qty}]")
 
     return quantity
