@@ -6,14 +6,10 @@ from utils.file_utils import save_data_to_file, load_config_values
 config = load_config_values("ORDER_VALUE")
 
 def check_coin_balance(wallet_balance, coin):
-    # Return just "free" balance, rest is irrelevant
     for asset in wallet_balance:
         if asset['asset'] == coin:
-            asset['free'] = float(asset['free'])  #
-            asset['locked'] = float(asset['locked'])
-            asset['total'] = asset['free'] + asset['locked']
-            return asset['free']
-    raise ValueError(f"{coin} not found in wallet.")
+            return float(asset['free'])
+    raise ValueError(f"{coin} notfound in wallet.")
 
 def extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount_to_use):
     # Fetch the current price
