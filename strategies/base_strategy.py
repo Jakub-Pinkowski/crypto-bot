@@ -1,7 +1,7 @@
 from strategies.scoring_systems import calculate_score
 from utils.file_utils import save_data_to_file
 
-# NOTE: Not config it for now
+# NOTE: Not using config for now
 # config = load_config_values("MAX_COIN_ALLOCATION")
 
 def is_coin_in_wallet(coin, wallet):
