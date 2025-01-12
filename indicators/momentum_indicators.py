@@ -94,27 +94,31 @@ def calculate_momentum_indicators(high_prices, low_prices, close_prices):
     try:
         # Relative Strength Index (RSI)
         rsi_period = config['MOMENTUM_INDICATORS']['RSI_WINDOW']
-        indicators['RSI'] = calculate_rsi(close_prices, rsi_period)
+        if len(close_prices) >= rsi_period:
+            indicators['RSI'] = calculate_rsi(close_prices, rsi_period)
 
         # Stochastic Oscillator
         stochastic_config = config['MOMENTUM_INDICATORS']['STOCHASTIC']
         stochastic_window = stochastic_config['WINDOW']
         smooth_window = stochastic_config['SMOOTH_WINDOW']
-        indicators['StochasticOscillator'] = calculate_stochastic_oscillator(
-            high_prices, low_prices, close_prices, stochastic_window, smooth_window
-        )
+        if len(high_prices) >= stochastic_window and len(low_prices) >= stochastic_window and len(close_prices) >= stochastic_window:
+            indicators['StochasticOscillator'] = calculate_stochastic_oscillator(
+                high_prices, low_prices, close_prices, stochastic_window, smooth_window
+            )
 
         # Williams %R
         williams_r_window = config['MOMENTUM_INDICATORS']['WILLIAMS_R_WINDOW']
-        indicators['Williams%R'] = calculate_williams_r(
-            high_prices, low_prices, close_prices, williams_r_window
-        )
+        if len(high_prices) >= williams_r_window and len(low_prices) >= williams_r_window and len(close_prices) >= williams_r_window:
+            indicators['Williams%R'] = calculate_williams_r(
+                high_prices, low_prices, close_prices, williams_r_window
+            )
 
         # Commodity Channel Index (CCI)
         cci_window = config['MOMENTUM_INDICATORS']['CCI_WINDOW']
-        indicators['CCI'] = calculate_cci(
-            high_prices, low_prices, close_prices, cci_window
-        )
+        if len(high_prices) >= cci_window and len(low_prices) >= cci_window and len(close_prices) >= cci_window:
+            indicators['CCI'] = calculate_cci(
+                high_prices, low_prices, close_prices, cci_window
+            )
 
     except Exception as e:
         print(f"Error in calculating momentum indicators: {e}")
