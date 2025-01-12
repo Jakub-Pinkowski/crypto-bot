@@ -27,6 +27,10 @@ def calculate_atr(highs, lows, closes, window=14):
     if len(highs) < window or len(lows) < window or len(closes) < window:
         return None
 
+    # Validate the window parameter
+    if not isinstance(window, int) or window < 1:
+        raise ValueError("window must be an integer >= 1")
+
     highs_series = pd.Series(highs)
     lows_series = pd.Series(lows)
     closes_series = pd.Series(closes)
