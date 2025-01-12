@@ -3,7 +3,9 @@ from utils.file_utils import load_config_values
 
 config = load_config_values("MOMENTUM_INDICATORS")
 
+
 def calculate_rsi(prices, window=14):
+    # Check if prices are provided and have sufficient length
     if not prices or len(prices) < window:
         return None
 
@@ -11,14 +13,24 @@ def calculate_rsi(prices, window=14):
     if not isinstance(window, int) or window < 1:
         raise ValueError("window must be an integer >= 1")
 
+    # If window size is 1, return NaN for all values
+    if window == 1:
+        return pd.Series([float('nan')] * len(prices))
+
+    # Convert prices to a pandas series
     prices_series = pd.Series(prices)
+
+    # Calculate price differences
     delta = prices_series.diff()
 
+    # Calculate gains (positive differences) and losses (negative differences)
     gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
 
+    # Calculate relative strength (RS) and RSI
     rs = gain / loss
     rsi = 100 - (100 / (1 + rs))
+
     return rsi
 
 def calculate_stochastic_oscillator(highs, lows, closes, window=14, smooth_window=3):
