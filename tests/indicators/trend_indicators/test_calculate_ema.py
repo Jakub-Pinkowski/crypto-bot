@@ -6,7 +6,6 @@ from tests.indicators.mock_data import MOCK_CONFIG_VALUES
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from indicators.trend_indicators import calculate_ema
 
-
 def test_calculate_ema_with_valid_data():
     # Test with a valid list of prices
     prices = [10, 20, 30, 40, 50]
