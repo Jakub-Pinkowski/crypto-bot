@@ -12,35 +12,55 @@ def check_coin_balance(wallet_balance, coin):
     raise ValueError(f"{coin} notfound in wallet.")
 
 
-def extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount_to_use):
+def round_quantity_to_step_size(quantity, step_size):
+    # Calculate the number of decimal places in step_size and round the quality accordingly
+    step_size_str = str(step_size)
+    decimal_places = len(step_size_str.split('.')[1]) if '.' in step_size_str else 0
+    quantity = round(quantity / step_size) * step_size
+
+    # Round the quantity to match the precision of step_size, need this to get around floating-point precision
+    quantity = round(quantity, decimal_places)
+
+    return quantity
+
+def extract_and_calculate_quantity(coin, trading_pair, coins_data, amount_to_use, coin_balance):
     # Fetch the current price
     current_price = float(client.ticker_price(symbol=trading_pair)['price'])
 
     # Extract LOT_SIZE filter
-    filters = coins_data[coin_to_buy]['pair_metadata'][trading_pair]['filters']
+    filters = coins_data[coin]['pair_metadata'][trading_pair]['filters']
     lot_size_filter = next((f for f in filters if f['filterType'] == 'LOT_SIZE'), None)
     if not lot_size_filter:
         raise ValueError(f"LOT_SIZE filter not found for trading pair {trading_pair}")
 
+    # Extract NOTIONAL filter
+    notional_filter = next((f for f in filters if f['filterType'] == 'NOTIONAL'), None)
+    if not notional_filter:
+        raise ValueError(f"NOTIONAL filter not found for trading pair {trading_pair}")
+
+
     min_qty = float(lot_size_filter['minQty'])
     max_qty = float(lot_size_filter['maxQty'])
     step_size = float(lot_size_filter['stepSize'])
+    min_notional = float(notional_filter['minNotional'])
 
-    # Calculate quantity
-    quantity = amount_to_use / current_price
+    # Calculate the desired quantity using the amount_to_use and current price
+    desired_quantity = amount_to_use / current_price
+    quantity = round_quantity_to_step_size(desired_quantity, step_size)
 
-    # Ensure quantity is not below the minimum allowed quantity
+    # Ensure the quantity is within the allowed range and meets the min_notional condition
     if quantity < min_qty:
-        quantity = min_qty
+        raise ValueError(f"Calculated quantity {quantity} is below the minimum allowed quantity of {min_qty}")
+    if quantity > max_qty:
+        raise ValueError(f"Calculated quantity {quantity} exceeds the maximum allowed quantity of {max_qty}")
+    if quantity * current_price < min_notional:
+        raise ValueError(f"Calculated quantity is below the minimum notional value of {min_notional}")
 
-    # Round to the nearest step size
-    quantity = math.floor(quantity / step_size) * step_size
+    if quantity < coin_balance:
+        return quantity
+    else:
+        raise ValueError(f"Insufficient balance for {coin}. Available: {coin_balance}, Required: {quantity}")
 
-    # Validate quantity
-    if not (min_qty <= quantity <= max_qty):
-        raise ValueError(f"Quantity {quantity} out of range: [{min_qty}, {max_qty}]")
-
-    return quantity
 
 def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
     # Define the trading pair
@@ -95,12 +115,13 @@ def sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance):
         coin_balance = check_coin_balance(wallet_balance, coin_to_sell)
 
         # Calculate the quantity to sell using the helper function
-        quantity = extract_and_calculate_quantity(coin_to_sell, trading_pair, coins_data, amount_to_use)
-
-        # Ensure quantity does not exceed available balance
-        if quantity > coin_balance:
-            print(f"Insufficient {coin_to_sell} balance. Selling entire available balance: {coin_balance}")
-            quantity = coin_balance
+        quantity = extract_and_calculate_quantity(
+            coin=coin_to_sell,
+            trading_pair=trading_pair,
+            coins_data=coins_data,
+            amount_to_use=amount_to_use,
+            coin_balance=coin_balance
+        )
 
         # Place a sell order
         order = client.new_order_test(
@@ -128,10 +149,8 @@ def make_transactions(coin_analysis, wallet_balance, coins_data):
         action = analysis['action']
 
         if action == 'SELL':
-            print(f"Attempting to sell {coin}")
             try:
                 sell_coin_for_usdt(coin, amount_to_use, coins_data, wallet_balance)
-                break
             except Exception as e:
                 print(f"Error during selling {coin}: {str(e)}")
 
