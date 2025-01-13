@@ -5,13 +5,14 @@ from utils.file_utils import save_data_to_file, load_config_values
 
 config = load_config_values("ORDER_VALUE", "TRAILING_DELTA")
 
+# TODO: Update tests
 def check_coin_balance(wallet_balance, coin):
     for asset in wallet_balance:
         if asset['asset'] == coin:
             return float(asset['free'])
     raise ValueError(f"{coin} notfound in wallet.")
 
-
+# TODO: Update tests
 def round_quantity_to_step_size(quantity, step_size):
     # Calculate the number of decimal places in step_size and round the quality accordingly
     step_size_str = str(step_size)
@@ -23,6 +24,7 @@ def round_quantity_to_step_size(quantity, step_size):
 
     return quantity
 
+# TODO: Update tests
 def extract_filter_parameters(filters):
     lot_size_filter = next((f for f in filters if f['filterType'] == 'LOT_SIZE'), None)
     notional_filter = next((f for f in filters if f['filterType'] == 'NOTIONAL'), None)
@@ -39,6 +41,7 @@ def extract_filter_parameters(filters):
 
     return min_qty, max_qty, step_size, min_notional
 
+# TODO: Update tests
 def validate_quantity(quantity, min_qty, max_qty, current_price, min_notional):
     if quantity < min_qty:
         raise ValueError(f"Quantity {quantity} is below the minimum allowed quantity of {min_qty}")
@@ -47,9 +50,8 @@ def validate_quantity(quantity, min_qty, max_qty, current_price, min_notional):
     if quantity * current_price < min_notional:
         raise ValueError(f"Quantity {quantity} is below the minimum notional value of {min_notional}")
 
-# TODO: Logic is for selling, need to adjust it for buying
-# TODO: Fix tests later as well
-def extract_and_calculate_quantity(coin, trading_pair, coins_data, amount_to_use, coin_balance):
+# TODO: Update tests
+def extract_and_calculate_quantity(coin, trading_pair, coins_data, amount_to_use, coin_balance=None):
     # Fetch the current price
     current_price = float(client.ticker_price(symbol=trading_pair)['price'])
 
@@ -64,15 +66,20 @@ def extract_and_calculate_quantity(coin, trading_pair, coins_data, amount_to_use
     # Validate the calculated quantity
     validate_quantity(quantity, min_qty, max_qty, current_price, min_notional)
 
-    if quantity < coin_balance:
-        return quantity
-    else:
-        coin_balance = round_quantity_to_step_size(coin_balance, step_size)
+    # If coin_balance is provided (selling a coin), adjust the quantity accordingly
+    if coin_balance is not None:
+        if quantity < coin_balance:
+            return quantity
+        else:
+            coin_balance = round_quantity_to_step_size(coin_balance, step_size)
 
-        # Validate the adjusted coin balance
-        validate_quantity(coin_balance, min_qty, max_qty, current_price, min_notional)
+            # Validate the adjusted coin balance
+            validate_quantity(coin_balance, min_qty, max_qty, current_price, min_notional)
 
-        return coin_balance
+            return coin_balance
+
+    # If coin_balance is not provided, simply return the calculated quantity
+    return quantity
 
 def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
     # Define the trading pair
@@ -83,7 +90,12 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
 
     try:
         # Calculate, process and validate quantity
-        quantity = extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount_to_use)
+        quantity = extract_and_calculate_quantity(
+            coin=coin_to_buy,
+            trading_pair=trading_pair,
+            coins_data=coins_data,
+            amount_to_use=amount_to_use,
+        )
 
         # NOTE: Remove the test part whenever needed
         # Place a buy order
