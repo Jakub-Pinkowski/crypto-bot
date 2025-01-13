@@ -3,7 +3,7 @@ from services.binance_auth import client
 from services.portfolio_manager import fetch_wallet_balance
 from utils.file_utils import save_data_to_file, load_config_values
 
-config = load_config_values("ORDER_VALUE")
+config = load_config_values("ORDER_VALUE", "TRAILING_DELTA")
 
 def check_coin_balance(wallet_balance, coin):
     for asset in wallet_balance:
@@ -43,27 +43,45 @@ def extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount
     return quantity
 
 def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
-    try:
-        # Define the trading pair
-        trading_pair = f"{coin_to_buy}USDT"
+    # Define the trading pair
+    trading_pair = f"{coin_to_buy}USDT"
 
+    # Define the trading delta for the attached selling order
+    trailing_delta = config['TRAILING_DELTA']
+
+    try:
         # Calculate, process and validate quantity
         quantity = extract_and_calculate_quantity(coin_to_buy, trading_pair, coins_data, amount_to_use)
-        print(f"Validated Quantity: {quantity}")
 
-        # Place an order
-        # order = client.new_order(
-        #     symbol=trading_pair,
-        #     side='BUY',
-        #     type='MARKET',
-        #     quantity=quantity
-        # )
+        # NOTE: Remove the test part whenever needed
+        # Place a buy order
+        buy_order = client.new_order.test(
+            symbol=trading_pair,
+            side='BUY',
+            type='MARKET',
+            quantity=quantity
+        )
 
         # Print the summary
         print(f"Bought {quantity} of {coin_to_buy} for {amount_to_use} USDT.")
 
         # Save the transaction details to a file
-        save_data_to_file(order, "transactions", "transaction")
+        save_data_to_file(buy_order, "transactions", "transaction")
+
+        # Optionally, place a trailing sell order
+        if trailing_delta:
+            # NOTE: Remove the test part whenever needed
+            # Place a trailing stop market sell order
+            trailing_order = client.new_order.test(
+                symbol=trading_pair,
+                side='SELL',
+                type='TRAILING_STOP_MARKET',
+                quantity=quantity,
+                trailingDelta=trailing_delta
+            )
+            print(f"Trailing Sell Order Successful: {trailing_order}")
+            save_data_to_file(trailing_order, "transactions", "trailing_sell_order")
+
     except Exception as e:
         # Handle and log any errors during the buy transaction
         print(f"An error occurred while trying to buy {coin_to_buy}: {e}")

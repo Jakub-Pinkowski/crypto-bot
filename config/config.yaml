@@ -37,4 +37,5 @@ MAX_COIN_ALLOCATION: 0.20  # Maximum portfolio allocation per coin in %
 
 # Order execution
 ORDER_VALUE: 10.0 # Order value for the transactions
+TRAILING_DELTA: 5 # Trailing delta for a selling order
 
