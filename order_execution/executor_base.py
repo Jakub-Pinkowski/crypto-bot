@@ -5,15 +5,17 @@ from utils.file_utils import save_data_to_file, load_config_values
 
 config = load_config_values("ORDER_VALUE", "TRAILING_DELTA")
 
-# TODO: Update tests
 def check_coin_balance(wallet_balance, coin):
     for asset in wallet_balance:
         if asset['asset'] == coin:
             return float(asset['free'])
     raise ValueError(f"{coin} notfound in wallet.")
 
-# TODO: Update tests
 def round_quantity_to_step_size(quantity, step_size):
+    # Validate that step_size is positive
+    if step_size < 0:
+        raise ValueError("Step size must be greater than or equal to 0.")
+
     # Calculate the number of decimal places in step_size and round the quality accordingly
     step_size_str = str(step_size)
     decimal_places = len(step_size_str.split('.')[1]) if '.' in step_size_str else 0
