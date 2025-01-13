@@ -51,7 +51,6 @@ def validate_quantity(quantity, min_qty, max_qty, current_price, min_notional):
     if total_value < min_notional:
         raise ValueError(f"Total value {total_value} is below the minimum notional value of {min_notional}")
 
-# TODO: Update tests
 def extract_and_calculate_quantity(coin, trading_pair, coins_data, amount_to_use, coin_balance=None):
     # Fetch the current price
     current_price = float(client.ticker_price(symbol=trading_pair)['price'])

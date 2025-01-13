@@ -1,149 +1,168 @@
 import pytest
-import math
 from unittest.mock import patch
 from tests.order_execution.mock_data import MOCK_CONFIG_VALUES
-
-# Mocking the necessary methods and data
-MOCK_COINS_DATA = {
-    'BTC': {
-        'pair_metadata': {
-            'BTCUSDT': {
-                'filters': [
-                    {'filterType': 'LOT_SIZE', 'minQty': '0.001', 'maxQty': '100.0', 'stepSize': '0.001'}
-                ]
-            }
-        }
-    },
-    'ETH': {
-        'pair_metadata': {
-            'ETHUSDT': {
-                'filters': [
-                    {'filterType': 'LOT_SIZE', 'minQty': '0.01', 'maxQty': '1000.0', 'stepSize': '0.01'}
-                ]
-            }
-        }
-    }
-}
-
-MOCK_PRICE = {'price': '10000'}
 
 # Mock `load_config_values`
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from order_execution.executor_base import extract_and_calculate_quantity
 
 
-# Mocking the `client.ticker_price` to return MOCK_PRICE dynamically
-def test_extract_and_calculate_quantity_valid_case():
-    coins_data = MOCK_COINS_DATA
-
-    # Test with dynamic current price (mocked)
-    amount_to_use = 10
-
-    # Mock `client.ticker_price` call to return the price dynamically
-    with patch('services.binance_auth.client.ticker_price', return_value=MOCK_PRICE):
-        # Calculate the expected quantity based on the mocked price
-        current_price = float(MOCK_PRICE['price'])
-        expected_quantity = amount_to_use / current_price
-
-        # Now, calculate the rounded quantity based on step size
-        step_size = 0.001
-        quantity = math.floor(expected_quantity / step_size) * step_size
-
-        # Now, perform the actual test with the function
-        result = extract_and_calculate_quantity('BTC', 'BTCUSDT', coins_data, amount_to_use)
-
-        # Assert the result matches the calculated quantity
-        assert result == quantity, f"Expected {quantity}, but got {result}"
-
-def test_extract_and_calculate_quantity_quantity_exceeds_max_qty():
-    coins_data = MOCK_COINS_DATA
-
-    # Test with an amount that results in a quantity greater than max_qty
-    amount_to_use = 1000000
-
-    # Mock `client.ticker_price` call to return the price dynamically
-    with patch('services.binance_auth.client.ticker_price', return_value=MOCK_PRICE):
-        # Calculate the expected quantity based on the mocked price
-        current_price = float(MOCK_PRICE['price'])
-        expected_quantity = amount_to_use / current_price
-
-        # Ensure the quantity exceeds max_qty and should be adjusted
-        max_qty = 100.0
-        expected_quantity = min(expected_quantity, max_qty)
-
-        # Now, calculate the rounded quantity based on step size
-        step_size = 0.001
-        quantity = math.floor(expected_quantity / step_size) * step_size
-
-        # Now, perform the actual test with the function
-        result = extract_and_calculate_quantity('BTC', 'BTCUSDT', coins_data, amount_to_use)
-
-        # Assert the result matches the calculated quantity
-        assert result == quantity, f"Expected {quantity}, but got {result}"
+# Mocked client for testing
+class MockClient:
+    @staticmethod
+    def ticker_price(symbol):
+        return {'price': '50.0'}  # Simulate a price response
 
 
-def test_extract_and_calculate_quantity_quantity_below_min_qty():
-    coins_data = MOCK_COINS_DATA
+@pytest.fixture
+def mock_client():
+    return MockClient()
 
-    # Test with an amount that results in a quantity less than min_qty
-    amount_to_use = 0.01
 
-    # Mock `client.ticker_price` call to return the price dynamically
-    with patch('services.binance_auth.client.ticker_price', return_value=MOCK_PRICE):
-        # Calculate the expected quantity based on the mocked price
-        current_price = float(MOCK_PRICE['price'])
-        expected_quantity = amount_to_use / current_price  # Expected is 0.000001
-
-        # Ensure the quantity is below the min_qty and should be adjusted to min_qty
-        min_qty = 0.001
-        expected_quantity = max(expected_quantity, min_qty)
-
-        # Now, calculate the rounded quantity based on step size
-        step_size = 0.001
-        quantity = math.floor(expected_quantity / step_size) * step_size
-
-        # Now, perform the actual test with the function
-        result = extract_and_calculate_quantity('BTC', 'BTCUSDT', coins_data, amount_to_use)
-
-        # Assert the result matches the calculated quantity
-        assert result == quantity, f"Expected {quantity}, but got {result}"
-
-def test_extract_and_calculate_quantity_missing_lot_size_filter():
-    coins_data = {
-        'BTC': {
-            'pair_metadata': {
-                'BTCUSDT': {
-                    'filters': []  # No LOT_SIZE filter
+def test_extract_and_calculate_quantity_valid_no_balance(mock_client):
+    # Test when coin_balance is not provided, calculate the quantity based on the amount_to_use
+    with patch("order_execution.executor_base.client", mock_client):
+        coins_data = {
+            'BTC': {
+                'pair_metadata': {
+                    'BTCUSDT': {
+                        'filters': [
+                            {'filterType': 'LOT_SIZE', 'minQty': '0.001', 'maxQty': '1000', 'stepSize': '0.001'},
+                            {'filterType': 'NOTIONAL', 'minNotional': '10'}
+                        ]
+                    }
                 }
             }
         }
-    }
 
-    amount_to_use = 10000
+        amount_to_use = 1000
+        result = extract_and_calculate_quantity('BTC', 'BTCUSDT', coins_data, amount_to_use)
+        assert result == 20.0  # Expected 1000 / 50 = 20.0 rounded to step size 0.001
 
-    # Mock `client.ticker_price` call to return the price dynamically
-    with patch('services.binance_auth.client.ticker_price', return_value=MOCK_PRICE):
-        with pytest.raises(ValueError, match="LOT_SIZE filter not found for trading pair BTCUSDT"):
+
+def test_extract_and_calculate_quantity_with_balance(mock_client):
+    # Test when coin_balance is provided, return the minimum of calculated quantity and coin_balance
+    with patch("order_execution.executor_base.client", mock_client):
+        coins_data = {
+            'BTC': {
+                'pair_metadata': {
+                    'BTCUSDT': {
+                        'filters': [
+                            {'filterType': 'LOT_SIZE', 'minQty': '0.001', 'maxQty': '1000', 'stepSize': '0.001'},
+                            {'filterType': 'NOTIONAL', 'minNotional': '10'}
+                        ]
+                    }
+                }
+            }
+        }
+
+        amount_to_use = 1000
+        coin_balance = 15.0  # Coin balance provided
+        result = extract_and_calculate_quantity('BTC', 'BTCUSDT', coins_data, amount_to_use, coin_balance)
+        assert result == 15.0  # Since coin_balance is 15.0, return the minimum between calculated and coin_balance
+
+
+def test_extract_and_calculate_quantity_invalid_quantity_below_min(mock_client):
+    # Test when quantity is below the minimum allowed quantity
+    with patch("order_execution.executor_base.client", mock_client):
+        coins_data = {
+            'BTC': {
+                'pair_metadata': {
+                    'BTCUSDT': {
+                        'filters': [
+                            {'filterType': 'LOT_SIZE', 'minQty': '0.1', 'maxQty': '1000', 'stepSize': '0.001'},
+                            {'filterType': 'NOTIONAL', 'minNotional': '10'}
+                        ]
+                    }
+                }
+            }
+        }
+
+        amount_to_use = 0  # This should result in a quantity that is below the minQty
+        with pytest.raises(ValueError, match="Quantity 0.0 is below the minimum allowed quantity of 0.1"):
             extract_and_calculate_quantity('BTC', 'BTCUSDT', coins_data, amount_to_use)
 
-def test_extract_and_calculate_quantity_rounding_behavior():
-    coins_data = MOCK_COINS_DATA
 
-    # Test with a case where rounding should happen
-    amount_to_use = 1000
+def test_extract_and_calculate_quantity_invalid_quantity_above_max(mock_client):
+    # Test when quantity exceeds the maximum allowed quantity
+    with patch("order_execution.executor_base.client", mock_client):
+        coins_data = {
+            'BTC': {
+                'pair_metadata': {
+                    'BTCUSDT': {
+                        'filters': [
+                            {'filterType': 'LOT_SIZE', 'minQty': '0.001', 'maxQty': '1000', 'stepSize': '0.001'},
+                            {'filterType': 'NOTIONAL', 'minNotional': '10'}
+                        ]
+                    }
+                }
+            }
+        }
 
-    # Mock `client.ticker_price` call to return the price dynamically
-    with patch('services.binance_auth.client.ticker_price', return_value=MOCK_PRICE):
-        # Calculate the expected quantity based on the mocked price
-        current_price = float(MOCK_PRICE['price'])
-        expected_quantity = amount_to_use / current_price  # Expected is 0.1
+        amount_to_use = 1000000  # This should result in a quantity above the maxQty
+        with pytest.raises(ValueError, match="Quantity 20000.0 exceeds the maximum allowed quantity of 1000"):
+            extract_and_calculate_quantity('BTC', 'BTCUSDT', coins_data, amount_to_use)
 
-        # Now, calculate the rounded quantity based on step size
-        step_size = 0.01
-        quantity = math.floor(expected_quantity / step_size) * step_size
 
-        # Now, perform the actual test with the function
-        result = extract_and_calculate_quantity('ETH', 'ETHUSDT', coins_data, amount_to_use)
+def test_extract_and_calculate_quantity_invalid_notional(mock_client):
+    # Test when the total value is below the minimum notional
+    with patch("order_execution.executor_base.client", mock_client):
+        coins_data = {
+            'BTC': {
+                'pair_metadata': {
+                    'BTCUSDT': {
+                        'filters': [
+                            {'filterType': 'LOT_SIZE', 'minQty': '0.001', 'maxQty': '1000', 'stepSize': '0.001'},
+                            {'filterType': 'NOTIONAL', 'minNotional': '100'}
+                        ]
+                    }
+                }
+            }
+        }
 
-        # Assert the result matches the calculated quantity
-        assert result == quantity, f"Expected {quantity}, but got {result}"
+        amount_to_use = 1  # This will result in a total value of 1.0, which is below the minNotional
+        with pytest.raises(ValueError, match="Total value 1.0 is below the minimum notional value of 100"):
+            extract_and_calculate_quantity('BTC', 'BTCUSDT', coins_data, amount_to_use)
+
+
+def test_extract_and_calculate_quantity_invalid_coin_balance(mock_client):
+    # Test when coin_balance is provided but less than the calculated quantity
+    with patch("order_execution.executor_base.client", mock_client):
+        coins_data = {
+            'BTC': {
+                'pair_metadata': {
+                    'BTCUSDT': {
+                        'filters': [
+                            {'filterType': 'LOT_SIZE', 'minQty': '0.001', 'maxQty': '1000', 'stepSize': '0.001'},
+                            {'filterType': 'NOTIONAL', 'minNotional': '10'}
+                        ]
+                    }
+                }
+            }
+        }
+
+        amount_to_use = 1000
+        coin_balance = 5  # Coin balance less than the calculated quantity
+        result = extract_and_calculate_quantity('BTC', 'BTCUSDT', coins_data, amount_to_use, coin_balance)
+        assert result == 5.0  # Return the coin_balance since it's less than the calculated quantity
+
+
+def test_extract_and_calculate_quantity_no_balance(mock_client):
+    # Test when coin_balance is None, calculate and return the quantity
+    with patch("order_execution.executor_base.client", mock_client):
+        coins_data = {
+            'BTC': {
+                'pair_metadata': {
+                    'BTCUSDT': {
+                        'filters': [
+                            {'filterType': 'LOT_SIZE', 'minQty': '0.001', 'maxQty': '1000', 'stepSize': '0.001'},
+                            {'filterType': 'NOTIONAL', 'minNotional': '10'}
+                        ]
+                    }
+                }
+            }
+        }
+
+        amount_to_use = 1000
+        result = extract_and_calculate_quantity('BTC', 'BTCUSDT', coins_data, amount_to_use)
+        assert result == 20.0  # Expected 1000 / 50 = 20.0 rounded to step size 0.001
