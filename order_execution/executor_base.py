@@ -23,44 +23,56 @@ def round_quantity_to_step_size(quantity, step_size):
 
     return quantity
 
-def extract_and_calculate_quantity(coin, trading_pair, coins_data, amount_to_use, coin_balance):
-    # Fetch the current price
-    current_price = float(client.ticker_price(symbol=trading_pair)['price'])
-
-    # Extract LOT_SIZE filter
-    filters = coins_data[coin]['pair_metadata'][trading_pair]['filters']
+def extract_filter_parameters(filters):
     lot_size_filter = next((f for f in filters if f['filterType'] == 'LOT_SIZE'), None)
-    if not lot_size_filter:
-        raise ValueError(f"LOT_SIZE filter not found for trading pair {trading_pair}")
-
-    # Extract NOTIONAL filter
     notional_filter = next((f for f in filters if f['filterType'] == 'NOTIONAL'), None)
-    if not notional_filter:
-        raise ValueError(f"NOTIONAL filter not found for trading pair {trading_pair}")
 
+    if not lot_size_filter:
+        raise ValueError("'LOT_SIZE' filter not found")
+    if not notional_filter:
+        raise ValueError("'NOTIONAL' filter not found")
 
     min_qty = float(lot_size_filter['minQty'])
     max_qty = float(lot_size_filter['maxQty'])
     step_size = float(lot_size_filter['stepSize'])
     min_notional = float(notional_filter['minNotional'])
 
+    return min_qty, max_qty, step_size, min_notional
+
+def validate_quantity(quantity, min_qty, max_qty, current_price, min_notional):
+    if quantity < min_qty:
+        raise ValueError(f"Quantity {quantity} is below the minimum allowed quantity of {min_qty}")
+    if quantity > max_qty:
+        raise ValueError(f"Quantity {quantity} exceeds the maximum allowed quantity of {max_qty}")
+    if quantity * current_price < min_notional:
+        raise ValueError(f"Quantity {quantity} is below the minimum notional value of {min_notional}")
+
+# TODO: Logic is for selling, need to adjust it for buying
+# TODO: Fix tests later as well
+def extract_and_calculate_quantity(coin, trading_pair, coins_data, amount_to_use, coin_balance):
+    # Fetch the current price
+    current_price = float(client.ticker_price(symbol=trading_pair)['price'])
+
+    # Extract filters for the trading pair
+    filters = coins_data[coin]['pair_metadata'][trading_pair]['filters']
+    min_qty, max_qty, step_size, min_notional = extract_filter_parameters(filters)
+
     # Calculate the desired quantity using the amount_to_use and current price
     desired_quantity = amount_to_use / current_price
     quantity = round_quantity_to_step_size(desired_quantity, step_size)
 
-    # Ensure the quantity is within the allowed range and meets the min_notional condition
-    if quantity < min_qty:
-        raise ValueError(f"Calculated quantity {quantity} is below the minimum allowed quantity of {min_qty}")
-    if quantity > max_qty:
-        raise ValueError(f"Calculated quantity {quantity} exceeds the maximum allowed quantity of {max_qty}")
-    if quantity * current_price < min_notional:
-        raise ValueError(f"Calculated quantity is below the minimum notional value of {min_notional}")
+    # Validate the calculated quantity
+    validate_quantity(quantity, min_qty, max_qty, current_price, min_notional)
 
     if quantity < coin_balance:
         return quantity
     else:
-        raise ValueError(f"Insufficient balance for {coin}. Available: {coin_balance}, Required: {quantity}")
+        coin_balance = round_quantity_to_step_size(coin_balance, step_size)
 
+        # Validate the adjusted coin balance
+        validate_quantity(coin_balance, min_qty, max_qty, current_price, min_notional)
+
+        return coin_balance
 
 def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
     # Define the trading pair
