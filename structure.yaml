@@ -33,8 +33,8 @@ crypto_bot/
 │   ├── test_utils.py             # Unit tests for utils
 ├── utils/
 │   ├── __init__.py               
-│   ├── logger.py                 # Logging utility
-│   ├── data_processing.py        # Helper functions for data manipulation or transformations
+│   ├── file_utils.py             # Helper functions for file manipulations
+│   ├── order_execution.py        # Helper functions for order execution
 ├── .env                          # Environment variables
 ├── .gitignore                    # Ignore secrets, logs, etc., for Git
 ├── main.py                       # Entry point for the bot
