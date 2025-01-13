@@ -26,7 +26,6 @@ def round_quantity_to_step_size(quantity, step_size):
 
     return quantity
 
-# TODO: Update tests
 def extract_filter_parameters(filters):
     lot_size_filter = next((f for f in filters if f['filterType'] == 'LOT_SIZE'), None)
     notional_filter = next((f for f in filters if f['filterType'] == 'NOTIONAL'), None)
@@ -43,14 +42,14 @@ def extract_filter_parameters(filters):
 
     return min_qty, max_qty, step_size, min_notional
 
-# TODO: Update tests
 def validate_quantity(quantity, min_qty, max_qty, current_price, min_notional):
+    total_value = quantity * current_price
     if quantity < min_qty:
         raise ValueError(f"Quantity {quantity} is below the minimum allowed quantity of {min_qty}")
     if quantity > max_qty:
         raise ValueError(f"Quantity {quantity} exceeds the maximum allowed quantity of {max_qty}")
-    if quantity * current_price < min_notional:
-        raise ValueError(f"Quantity {quantity} is below the minimum notional value of {min_notional}")
+    if total_value < min_notional:
+        raise ValueError(f"Total value {total_value} is below the minimum notional value of {min_notional}")
 
 # TODO: Update tests
 def extract_and_calculate_quantity(coin, trading_pair, coins_data, amount_to_use, coin_balance=None):
