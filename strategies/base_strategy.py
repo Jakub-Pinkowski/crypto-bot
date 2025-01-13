@@ -34,7 +34,7 @@ def determine_action(coin, score, wallet_balance):
             return "DO NOT BUY"
 
     # BUY condition: Always allow buying if the score is high
-    if score > 70:
+    if score > 40:
         return "BUY"
 
     # HOLD condition: Only hold if the coin is in the wallet

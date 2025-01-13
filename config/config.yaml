@@ -1,6 +1,6 @@
 # Initial coin filtering options
-PRICE_CHANGE_THRESHOLD: 15.0  # Minimum percentage price change (absolute)
-PRICE_RANGE_VOLATILITY_THRESHOLD: 0.01  # Minimum range volatility in %
+PRICE_CHANGE_THRESHOLD: 6.0  # Minimum percentage price change (absolute)
+PRICE_RANGE_VOLATILITY_THRESHOLD: 0.03  # Minimum range volatility in %
 
 # Technical indicator parameters
 TREND_INDICATORS:
@@ -37,5 +37,6 @@ MAX_COIN_ALLOCATION: 0.20  # Maximum portfolio allocation per coin in %
 
 # Order execution
 ORDER_VALUE: 10.0 # Order value for the transactions
-TRAILING_DELTA: 5 # Trailing delta for a selling order
+STOP_LOSS_DELTA: 3 # Stop loss in %
+TAKE_PROFIT_DELTA: 5 # Take profit in %
 

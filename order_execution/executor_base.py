@@ -3,7 +3,7 @@ from services.portfolio_manager import fetch_wallet_balance
 from utils.file_utils import save_data_to_file, load_config_values
 from utils.order_execution import check_coin_balance, extract_filter_parameters, round_quantity_to_step_size, validate_quantity
 
-config = load_config_values("ORDER_VALUE", "TRAILING_DELTA")
+config = load_config_values("ORDER_VALUE", "STOP_LOSS_DELTA", "TAKE_PROFIT_DELTA")
 
 def extract_and_calculate_quantity(coin, trading_pair, coins_data, amount_to_use, coin_balance=None):
     # Fetch the current price
@@ -40,7 +40,8 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
     trading_pair = f"{coin_to_buy}USDT"
 
     # Define the trading delta for the attached selling order
-    trailing_delta = config['TRAILING_DELTA']
+    stop_loss_delta = config['STOP_LOSS_DELTA']
+    take_profit_delta = config['TAKE_PROFIT_DELTA']
 
     try:
         # Calculate, process and validate quantity
@@ -53,7 +54,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
 
         # NOTE: Remove the test part whenever needed
         # Place a buy order
-        buy_order = client.new_order.test(
+        buy_order = client.new_order_test(
             symbol=trading_pair,
             side='BUY',
             type='MARKET',
@@ -66,19 +67,45 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         # Save the transaction details to a file
         save_data_to_file(buy_order, "transactions", "transaction")
 
-        # Optionally, place a trailing sell order
-        if trailing_delta:
-            # NOTE: Remove the test part whenever needed
-            # Place a trailing stop market sell order
-            trailing_order = client.new_order.test(
-                symbol=trading_pair,
-                side='SELL',
-                type='TRAILING_STOP_MARKET',
-                quantity=quantity,
-                trailingDelta=trailing_delta
-            )
-            print(f"Trailing Sell Order Successful: {trailing_order}")
-            save_data_to_file(trailing_order, "transactions", "trailing_sell_order")
+        # TODO: Fine-tune and outsource calculating take_profit_price and stop_loss_price price.
+        # TODO: Add tests to this function all all dependent on it
+        # TODO: Add a config whether we attach the selling orders or not
+        # TODO: Test the values of price, stopPrice for each function
+        # Calculate the take profit and stop loss prices based on current market price
+        current_price = float(client.ticker_price(symbol=trading_pair)['price'])
+
+        # Take profit price: current price + take profit delta
+        take_profit_price = current_price * (1 + take_profit_delta / 100)
+
+        # Stop loss price: current price - stop loss delta
+        stop_loss_price = current_price * (1 - stop_loss_delta / 100)
+
+        # Place the take-profit order (take-profit-limit)
+        take_profit_order = client.new_order_test(
+            symbol=trading_pair,
+            side='SELL',
+            type='TAKE_PROFIT_LIMIT',
+            quantity=quantity,
+            price=str(round(take_profit_price, 2)),  # Round to 2 decimals
+            stopPrice=str(round(take_profit_price, 2)),  # Trigger at the same price
+            timeInForce = 'GTC'  # Adding the 'timeInForce' parameter
+        )
+        print(f"Take Profit Order Placed: {take_profit_order}")
+        save_data_to_file(take_profit_order, "transactions", "take_profit_order")
+
+        # Place the stop-loss order (stop-loss-limit)
+        stop_loss_order = client.new_order_test(
+            symbol=trading_pair,
+            side='SELL',
+            type='STOP_LOSS_LIMIT',
+            quantity=quantity,
+            price=str(round(stop_loss_price, 2)),  # Round to 2 decimals
+            stopPrice=str(round(stop_loss_price, 2)),  # Trigger at the same price
+            timeInForce='GTC'  # Adding the 'timeInForce' parameter
+        )
+
+        print(f"Stop Loss Order Placed: {stop_loss_order}")
+        save_data_to_file(stop_loss_order, "transactions", "stop_loss_order")
 
     except Exception as e:
         # Handle and log any errors during the buy transaction
