@@ -59,8 +59,6 @@ def analyze_coins(indicators, wallet_balance):
         action = determine_action(coin, score, wallet_balance)
         coin_analysis.append({"coin": coin, "score": score, "action": action})
 
-    print(f"coin_analysis: {coin_analysis}")
-
     # Save the ranked coins
     save_data_to_file(ranked_coins, "analysis", "ranked_coins")
     save_data_to_file(coin_analysis, "analysis", "coin_analysis")

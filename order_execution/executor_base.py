@@ -102,15 +102,13 @@ def sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance):
             print(f"Insufficient {coin_to_sell} balance. Selling entire available balance: {coin_balance}")
             quantity = coin_balance
 
-        print(f"Validated selling quantity: {quantity}")
-
         # Place a sell order
-        # order = client.new_order(
-        #     symbol=trading_pair,
-        #     side='SELL',
-        #     type='MARKET',
-        #     quantity=quantity
-        # )
+        order = client.new_order_test(
+            symbol=trading_pair,
+            side='SELL',
+            type='MARKET',
+            quantity=quantity
+        )
 
         # Print the summary
         print(f"Sold {quantity} of {coin_to_sell} for USDT")
@@ -125,7 +123,6 @@ def make_transactions(coin_analysis, wallet_balance, coins_data):
     # Amount to use for buying a new coin (in USDT)
     amount_to_use = config['ORDER_VALUE']
 
-    # Perform SELL actions
     for analysis in coin_analysis:
         coin = analysis['coin']
         action = analysis['action']
@@ -134,6 +131,7 @@ def make_transactions(coin_analysis, wallet_balance, coins_data):
             print(f"Attempting to sell {coin}")
             try:
                 sell_coin_for_usdt(coin, amount_to_use, coins_data, wallet_balance)
+                break
             except Exception as e:
                 print(f"Error during selling {coin}: {str(e)}")
 
