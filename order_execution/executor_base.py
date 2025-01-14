@@ -71,6 +71,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         # TODO: Add tests to this function all all dependent on it
         # TODO: Add a config whether we attach the selling orders or not
         # TODO: Test the values of price, stopPrice for each function
+
         # Calculate the take profit and stop loss prices based on current market price
         current_price = float(client.ticker_price(symbol=trading_pair)['price'])
 
