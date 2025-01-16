@@ -73,8 +73,16 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
 
         # Calculate the take profit and stop loss prices based on current market price
         current_price = float(client.ticker_price(symbol=trading_pair)['price'])
+
+        # Calculate take profit and stop loss prices
         take_profit_price = current_price * (1 + take_profit_delta / 100)
         stop_loss_price = current_price * (1 - stop_loss_delta / 100)
+
+        # Round and stringify the prices
+        take_profit_price_rounded = str(round(take_profit_price, 2))
+        stop_loss_price_rounded = str(round(stop_loss_price, 2))
+
+        print(f"{coin_to_buy} Current Price: {current_price}, Take Profit Price: {take_profit_price}, Stop Loss Price: {stop_loss_price}")
 
         # Place the take-profit order (take-profit-limit)
         take_profit_order = client.new_order_test(
@@ -82,9 +90,9 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
             side='SELL',
             type='TAKE_PROFIT_LIMIT',
             quantity=quantity,
-            price=str(round(take_profit_price, 2)),  # Round to 2 decimals
-            stopPrice=str(round(take_profit_price, 2)),  # Trigger at the same price
-            timeInForce = 'GTC'  # Adding the 'timeInForce' parameter
+            price=take_profit_price_rounded,
+            stopPrice=take_profit_price_rounded,
+            timeInForce = 'GTC'
         )
         print(f"Take Profit Order Placed: {take_profit_order}")
         save_data_to_file(take_profit_order, "transactions", "take_profit_order")
@@ -95,9 +103,9 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
             side='SELL',
             type='STOP_LOSS_LIMIT',
             quantity=quantity,
-            price=str(round(stop_loss_price, 2)),  # Round to 2 decimals
-            stopPrice=str(round(stop_loss_price, 2)),  # Trigger at the same price
-            timeInForce='GTC'  # Adding the 'timeInForce' parameter
+            price=stop_loss_price_rounded,
+            stopPrice=stop_loss_price_rounded,
+            timeInForce='GTC'
         )
 
         print(f"Stop Loss Order Placed: {stop_loss_order}")
