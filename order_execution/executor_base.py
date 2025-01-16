@@ -73,10 +73,10 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         # TODO: Read more about trailing orders and update the function
         # https://developers.binance.com/docs/binance-spot-api-docs/faqs/trailing-stop-faq#trailing-stop-order-scenarios
 
-        # Calculate the take profit and stop loss prices based on current market price
+        # Get the current price from the market
         current_price = float(client.ticker_price(symbol=trading_pair)['price'])
 
-        # Calculate take profit and stop loss prices
+        # Calculate take profit price based on the current price and take profit delta
         take_profit_price = str(round(current_price * (1 + take_profit_delta / 100), 5))
         stop_loss_price = str(round(current_price * (1 - stop_loss_delta / 100), 5))
         take_profit_delta = str(take_profit_delta * 100)
