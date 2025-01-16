@@ -75,12 +75,8 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         current_price = float(client.ticker_price(symbol=trading_pair)['price'])
 
         # Calculate take profit and stop loss prices
-        take_profit_price = current_price * (1 + take_profit_delta / 100)
-        stop_loss_price = current_price * (1 - stop_loss_delta / 100)
-
-        # Round and stringify the prices
-        take_profit_price_rounded = str(round(take_profit_price, 2))
-        stop_loss_price_rounded = str(round(stop_loss_price, 2))
+        take_profit_price = str(round(current_price * (1 + take_profit_delta / 100), 5))
+        stop_loss_price = str(round(current_price * (1 - stop_loss_delta / 100), 5))
 
         print(f"{coin_to_buy} Current Price: {current_price}, Take Profit Price: {take_profit_price}, Stop Loss Price: {stop_loss_price}")
 
@@ -90,8 +86,8 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
             side='SELL',
             type='TAKE_PROFIT_LIMIT',
             quantity=quantity,
-            price=take_profit_price_rounded,
-            stopPrice=take_profit_price_rounded,
+            price=take_profit_price,
+            stopPrice=take_profit_price,
             timeInForce = 'GTC'
         )
         print(f"Take Profit Order Placed: {take_profit_order}")
@@ -103,8 +99,8 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
             side='SELL',
             type='STOP_LOSS_LIMIT',
             quantity=quantity,
-            price=stop_loss_price_rounded,
-            stopPrice=stop_loss_price_rounded,
+            price=stop_loss_price,
+            stopPrice=stop_loss_price,
             timeInForce='GTC'
         )
 
