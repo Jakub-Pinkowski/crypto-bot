@@ -34,6 +34,8 @@ VOLATILITY_INDICATORS:
 
 # Strategy
 MAX_COIN_ALLOCATION: 0.20  # Maximum portfolio allocation per coin in %
+BUY_CONDITION: 60 # Score needed to buy a coin
+SELL_CONDITION: 30 # Score needed to sell a coin
 
 # Order execution
 ORDER_VALUE: 10.0 # Order value for the transactions

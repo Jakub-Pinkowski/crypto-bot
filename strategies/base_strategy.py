@@ -1,8 +1,7 @@
 from strategies.scoring_systems import calculate_score
-from utils.file_utils import save_data_to_file
+from utils.file_utils import load_config_values, save_data_to_file
 
-# NOTE: Not using config for now
-# config = load_config_values("MAX_COIN_ALLOCATION")
+config = load_config_values("BUY_CONDITION", "SELL_CONDITION")
 
 def is_coin_in_wallet(coin, wallet):
     return any(entry["asset"] == coin and entry["free"] > 0 for entry in wallet)
@@ -26,15 +25,18 @@ def determine_action(coin, score, wallet_balance):
     # Check if the coin is in the wallet
     coin_in_wallet = is_coin_in_wallet(coin, wallet_balance)
 
+    buy_condition = config["BUY_CONDITION"]
+    sell_condition = config["SELL_CONDITION"]
+
     # SELL condition: Only sell if the coin is in the wallet
-    if score < 30:
+    if score < sell_condition:
         if coin_in_wallet:
             return "SELL"
         else:
             return "DO NOT BUY"
 
     # BUY condition: Always allow buying if the score is high
-    if score > 40:
+    if score > buy_condition:
         return "BUY"
 
     # HOLD condition: Only hold if the coin is in the wallet
