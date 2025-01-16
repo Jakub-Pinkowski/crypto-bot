@@ -67,18 +67,13 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         # Save the transaction details to a file
         save_data_to_file(buy_order, "transactions", "transaction")
 
-        # TODO: Fine-tune and outsource calculating take_profit_price and stop_loss_price price.
         # TODO: Add tests to this function all all dependent on it
         # TODO: Add a config whether we attach the selling orders or not
         # TODO: Test the values of price, stopPrice for each function
 
         # Calculate the take profit and stop loss prices based on current market price
         current_price = float(client.ticker_price(symbol=trading_pair)['price'])
-
-        # Take profit price: current price + take profit delta
         take_profit_price = current_price * (1 + take_profit_delta / 100)
-
-        # Stop loss price: current price - stop loss delta
         stop_loss_price = current_price * (1 - stop_loss_delta / 100)
 
         # Place the take-profit order (take-profit-limit)
