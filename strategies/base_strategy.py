@@ -21,6 +21,7 @@ def rank_coins(indicators):
 
     return rankings
 
+# TODO: Update tests
 def determine_action(coin, score, wallet_balance):
     # Check if the coin is in the wallet
     coin_in_wallet = is_coin_in_wallet(coin, wallet_balance)
@@ -61,8 +62,7 @@ def analyze_coins(indicators, wallet_balance):
         action = determine_action(coin, score, wallet_balance)
         coin_analysis.append({"coin": coin, "score": score, "action": action})
 
-    # Save the ranked coins
-    save_data_to_file(ranked_coins, "analysis", "ranked_coins")
+    # Save the analysis
     save_data_to_file(coin_analysis, "analysis", "coin_analysis")
 
     return coin_analysis
