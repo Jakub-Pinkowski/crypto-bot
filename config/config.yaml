@@ -39,6 +39,6 @@ SELL_CONDITION: 30 # Score needed to sell a coin
 
 # Order execution
 ORDER_VALUE: 10.0 # Order value for the transactions
-STOP_LOSS_DELTA: 3 # Stop loss in %
-TAKE_PROFIT_DELTA: 5 # Take profit in %
+STOP_LOSS_DELTA: 5 # Stop loss in %
+TAKE_PROFIT_DELTA: 7 # Take profit in %
 

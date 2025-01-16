@@ -70,6 +70,8 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         # TODO: Add tests to this function all all dependent on it
         # TODO: Add a config whether we attach the selling orders or not
         # TODO: Test the values of price, stopPrice for each function
+        # TODO: Read more about trailing orders and update the function
+        # https://developers.binance.com/docs/binance-spot-api-docs/faqs/trailing-stop-faq#trailing-stop-order-scenarios
 
         # Calculate the take profit and stop loss prices based on current market price
         current_price = float(client.ticker_price(symbol=trading_pair)['price'])
@@ -77,8 +79,10 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         # Calculate take profit and stop loss prices
         take_profit_price = str(round(current_price * (1 + take_profit_delta / 100), 5))
         stop_loss_price = str(round(current_price * (1 - stop_loss_delta / 100), 5))
+        take_profit_delta = str(take_profit_delta * 100)
+        stop_loss_delta = str(stop_loss_delta * 100)
 
-        print(f"{coin_to_buy} Current Price: {current_price}, Take Profit Price: {take_profit_price}, Stop Loss Price: {stop_loss_price}")
+        print(f"{coin_to_buy} Current Price: {current_price}, Take Profit Price: {take_profit_price}, Stop Loss Price: {stop_loss_price}, Take Profit Delta: {take_profit_delta}, Stop Loss Delta: {stop_loss_delta}")
 
         # Place the take-profit order (take-profit-limit)
         take_profit_order = client.new_order_test(
@@ -88,6 +92,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
             quantity=quantity,
             price=take_profit_price,
             stopPrice=take_profit_price,
+            trailingDelta=take_profit_delta,
             timeInForce = 'GTC'
         )
         print(f"Take Profit Order Placed: {take_profit_order}")
@@ -101,6 +106,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
             quantity=quantity,
             price=stop_loss_price,
             stopPrice=stop_loss_price,
+            trailingDelta=stop_loss_delta,
             timeInForce='GTC'
         )
 
