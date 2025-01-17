@@ -20,6 +20,41 @@ def save_data_to_file(data, file_path, file_name):
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
 
+def load_data_from_file(file_path, file_name):
+    # NOTE: Loads the latest file by default
+    # Prepare the directory
+    base_dir = os.path.dirname(os.path.dirname(__file__))
+    directory = os.path.join(base_dir, "data", file_path)
+
+    # Get the most recent date folder
+    if not os.path.exists(directory):
+        raise FileNotFoundError(f"Directory not found: {directory}")
+
+    date_folders = sorted(
+        [d for d in os.listdir(directory) if os.path.isdir(os.path.join(directory, d))],
+        reverse=True
+    )
+    if not date_folders:
+        raise FileNotFoundError(f"No date folders found in: {directory}")
+
+    latest_date_folder = os.path.join(directory, date_folders[0])
+
+    # Find the latest file with the specified prefix
+    matching_files = sorted(
+        [f for f in os.listdir(latest_date_folder) if f.startswith(file_name) and f.endswith(".json")],
+        reverse=True
+    )
+    if not matching_files:
+        raise FileNotFoundError(f"No files found with prefix '{file_name}' in folder: {latest_date_folder}")
+
+    latest_file = os.path.join(latest_date_folder, matching_files[0])
+
+    # Read and return the JSON data
+    with open(latest_file, "r") as file:
+        data = json.load(file)
+
+    return data
+
 def load_config_values(*keys):
     config_path = os.path.join("config", "config.yaml")
 
