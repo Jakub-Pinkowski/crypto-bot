@@ -20,6 +20,7 @@ def save_data_to_file(data, file_path, file_name):
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
 
+# TODO: Write tests for this function
 def load_data_from_file(file_path, file_name):
     # NOTE: Loads the latest file by default
     # Prepare the directory

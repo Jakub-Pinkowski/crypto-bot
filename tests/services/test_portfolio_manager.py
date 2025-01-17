@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch
-from services.portfolio_manager import extract_balance, fetch_wallet_balance
+from services.wallet_info import extract_balance, fetch_wallet_balance
 
 def test_extract_balance_with_valid_data():
     wallet_info = {

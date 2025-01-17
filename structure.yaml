@@ -21,7 +21,7 @@ crypto_bot/
 │   ├── __init__.py               
 │   ├── binance_auth.py           # Binance authentication
 │   ├── data_fetcher.py           # Fetch market data from exchanges
-│   ├── portfolio_manager.py      # Track portfolio (e.g., balances, PnL)
+│   ├── wallet_info.py            # Track portfolio (e.g., balances, PnL)
 ├── strategies/                   # New folder for all strategies
 │   ├── __init__.py               
 │   ├── base_strategy.py          # Base class/interface for all strategies

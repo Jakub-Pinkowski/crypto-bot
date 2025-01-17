@@ -1,5 +1,5 @@
 from services.binance_auth import client
-from services.portfolio_manager import fetch_wallet_balance
+from services.wallet_info import fetch_wallet_balance
 from utils.file_utils import save_data_to_file, load_config_values
 
 config = load_config_values("PRICE_CHANGE_THRESHOLD", "PRICE_RANGE_VOLATILITY_THRESHOLD")

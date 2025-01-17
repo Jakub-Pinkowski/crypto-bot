@@ -1,5 +1,5 @@
 from services.binance_auth import client
-from services.portfolio_manager import fetch_wallet_balance
+from services.wallet_info import fetch_wallet_balance
 from utils.file_utils import save_data_to_file, load_config_values
 from utils.order_execution import check_coin_balance, extract_filter_parameters, round_quantity_to_step_size, validate_quantity
 
@@ -70,7 +70,6 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         # TODO: Add tests to this function all all dependent on it
         # TODO: Add a config whether we attach the selling orders or not
         # TODO: Test the values of price, stopPrice for each function
-        # TODO: Read more about trailing orders and update the function
         # https://developers.binance.com/docs/binance-spot-api-docs/faqs/trailing-stop-faq#trailing-stop-order-scenarios
 
         # Get the current price from the market
