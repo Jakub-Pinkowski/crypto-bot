@@ -2,6 +2,7 @@ import csv
 from services.binance_auth import client
 from utils.file_utils import save_data_to_file, load_data_from_file
 
+# NOTE: The whole file is not being used yet
 def get_wallet_info():
     # Fetch wallet info
     wallet_info = client.account()
