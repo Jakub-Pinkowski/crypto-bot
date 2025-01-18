@@ -83,7 +83,5 @@ crypto_bot/
 ```
 
 ## Known issues
-- **Lack of backtesting functionality**: The bot currently does not support historical data backtesting
 - **Error handling**: Comprehensive error handling for API failures and connection issues is limited
 - **Floating points imprecision**: The bot calculations might experience floating point inaccuracies during financial computations, particularly for trading amounts.
-- **Sensitive data management**: Even though secrets.yaml exists, additional encryption or obfuscation mechanisms could improve the security of sensitive information.
