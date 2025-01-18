@@ -21,7 +21,7 @@ def round_number(number, step_size):
     # Round again to match the precision of step_size
     rounded_number = rounded_number.quantize(step_size)
 
-    return float(rounded_number)  # Convert back to float if necessary
+    return float(rounded_number)  # Convert back to float
 
 def format_price(price, tick_size):
     # Convert tick_size to string to determine the number of decimal places

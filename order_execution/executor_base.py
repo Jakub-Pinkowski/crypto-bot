@@ -177,14 +177,20 @@ def sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance):
         # Define the trading pair
         trading_pair = f"{coin_to_sell}USDT"
 
+        # Extract filters for the trading pair
+        filters = coins_data[coin_to_sell]['pair_metadata'][trading_pair]['filters']
+        filter_params = extract_filter_parameters(filters)
+
+        # Get the current price from the market
+        current_price = float(client.ticker_price(symbol=trading_pair)['price'])
+
         # Find the coin_to_sell in the wallet
         coin_balance = check_coin_balance(wallet_balance, coin_to_sell)
 
-        # Calculate the quantity to sell using the helper function
+        # Calculate, process and validate quantity
         quantity = calculate_quantity(
-            coin=coin_to_sell,
-            trading_pair=trading_pair,
-            coins_data=coins_data,
+            current_price=current_price,
+            filter_params=filter_params,
             amount_to_use=amount_to_use,
             coin_balance=coin_balance
         )
