@@ -8,7 +8,6 @@ config = load_config_values("PRICE_CHANGE_THRESHOLD", "PRICE_RANGE_VOLATILITY_TH
 def get_coins_data():
     # Fetch general symbols data
     all_symbols_data = fetch_all_symbols_data()
-    print(f"All symbols data fetched")
 
     # Filter for potential coins
     potential_coins = filter_potential_coins(all_symbols_data)
@@ -98,9 +97,6 @@ def fetch_coins_data(all_symbols_data, potential_and_wallet_coins):
 
     for coin in potential_and_wallet_coins:
         if coin == "USDT":
-            continue
-
-        if coin == "BNB":
             continue
 
         pairings = [symbol for symbol in symbols if symbol['baseAsset'] == coin or symbol['quoteAsset'] == coin]

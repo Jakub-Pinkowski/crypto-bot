@@ -3,7 +3,7 @@ from services.wallet_info import fetch_wallet_balance
 from utils.file_utils import save_data_to_file, load_config_values
 from utils.order_execution import check_coin_balance, extract_filter_parameters, round_number, format_price, validate_quantity
 
-config = load_config_values("ORDER_VALUE", "STOP_LOSS_DELTA", "TAKE_PROFIT_DELTA")
+config = load_config_values("ORDER_VALUE", "TAKE_PROFIT_DELTA", "STOP_LOSS_DELTA")
 
 
 def calculate_quantity(current_price, filter_params, amount_to_use, coin_balance=None):
@@ -131,10 +131,8 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
             quantity=quantity
         )
 
-        # Print the summary
+        # Log the summary
         print(f"Bought {quantity} of {coin_to_buy} for {amount_to_use} USDT.")
-
-        # Save the transaction details to a file
         save_data_to_file(buy_order, "transactions", "buy_order")
 
         # TODO: Add tests to this function all all dependent on it
@@ -152,6 +150,8 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
             trailingDelta=take_profit_trailing_delta,
             timeInForce='GTC'
         )
+
+        # Log the summary
         print(f"Take Profit Order Placed: {take_profit_order}")
         save_data_to_file(take_profit_order, "transactions", "take_profit_order")
 
@@ -167,6 +167,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
             timeInForce='GTC'
         )
 
+        # Log the summary
         print(f"Stop Loss Order Placed: {stop_loss_order}")
         save_data_to_file(stop_loss_order, "transactions", "stop_loss_order")
 
@@ -206,10 +207,8 @@ def sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance):
             quantity=quantity
         )
 
-        # Print the summary
+        # Log the summary
         print(f"Sold {quantity} of {coin_to_sell} for USDT")
-
-        # Save the transaction details to a file
         save_data_to_file(order, "transactions", "sell_order")
     except Exception as e:
         # Handle and log any errors during the sell transaction
