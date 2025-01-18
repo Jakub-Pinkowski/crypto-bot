@@ -23,6 +23,14 @@ def round_number(number, step_size):
 
     return float(rounded_number)  # Convert back to float if necessary
 
+def format_price(price, tick_size):
+    # Convert tick_size to string to determine the number of decimal places
+    tick_size_decimal_places = abs(int(Decimal(str(tick_size)).as_tuple().exponent))
+
+    # Format the price with the appropriate number of decimal places
+    return f"{price:.{tick_size_decimal_places}f}"
+
+
 def extract_filter_parameters(filters):
     # Find relevant filters
     price_filter = next((f for f in filters if f['filterType'] == 'PRICE_FILTER'), None)

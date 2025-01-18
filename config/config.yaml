@@ -34,12 +34,13 @@ VOLATILITY_INDICATORS:
 
 # Strategy
 MAX_COIN_ALLOCATION: 0.20  # Maximum portfolio allocation per coin in %
-BUY_CONDITION: 20 # Score needed to buy a coin
-SELL_CONDITION: 10 # Score needed to sell a coin
+BUY_CONDITION: 10 # Score needed to buy a coin
+SELL_CONDITION: 0 # Score needed to sell a coin
 
 # Order execution
 ORDER_VALUE: 10.0 # Order value for the transactions
 TAKE_PROFIT_DELTA: 700 # Take profit in base points
 STOP_LOSS_DELTA: 500 # Stop loss in base points
 
-
+# TODO for the whole project:
+# Optimize the data we download for each coin to speed up the process

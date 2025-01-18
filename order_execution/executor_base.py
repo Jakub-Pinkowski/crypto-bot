@@ -1,7 +1,7 @@
 from services.binance_auth import client
 from services.wallet_info import fetch_wallet_balance
 from utils.file_utils import save_data_to_file, load_config_values
-from utils.order_execution import check_coin_balance, extract_filter_parameters, round_number, validate_quantity
+from utils.order_execution import check_coin_balance, extract_filter_parameters, round_number, format_price, validate_quantity
 
 config = load_config_values("ORDER_VALUE", "STOP_LOSS_DELTA", "TAKE_PROFIT_DELTA")
 
@@ -10,15 +10,12 @@ def calculate_quantity(current_price, filter_params, amount_to_use, coin_balance
     min_qty = filter_params['lot_size']['min_qty']
     max_qty = filter_params['lot_size']['max_qty']
     step_size = filter_params['lot_size']['step_size']
-    print(f"Step size: {step_size}")
     min_notional = filter_params['notional']['min_notional']
 
     # Calculate the desired quantity using the amount_to_use and current price
     desired_quantity = amount_to_use / current_price
-    print(f"Desired quantity: {desired_quantity}")
 
     quantity = round_number(desired_quantity, step_size)
-    print(f"Rounded quantity: {quantity}")
 
     # Validate the calculated quantity
     validate_quantity(quantity, min_qty, max_qty, current_price, min_notional)
@@ -52,8 +49,7 @@ def calculate_prices(current_price, take_profit_delta, stop_loss_delta, filter_p
     take_profit_price = max(min_price, min(max_price, take_profit_price))
     stop_loss_price = max(min_price, min(max_price, stop_loss_price))
 
-    # Round the prices to the tick size
-
+    #
     print(f"Current price: {current_price}, tick size: {tick_size}")
     print(f"Take profit price before rounding: {take_profit_price}, stop loss price before rounding: {stop_loss_price}")
 
@@ -121,11 +117,11 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
 
     take_profit_price = round_number(take_profit_price, tick_size)
     stop_loss_price = round_number(stop_loss_price, tick_size)
-    print(f"Tick size {tick_size}, take profit price: {take_profit_price}, stop loss price: {stop_loss_price}")
+    print(f"AFTER ROUNDING Tick size {tick_size}, take profit price: {take_profit_price}, stop loss price: {stop_loss_price}")
 
-    # FIXME: Errors when numbers are too small, for example:
-    # Current price: 3.258e-05, tick size: 1e-08
-    # Take profit price before rounding: 3.48606e-05, stop loss price before rounding: 3.0951e-05
+    take_profit_price = format_price(take_profit_price, tick_size)
+    stop_loss_price = format_price(stop_loss_price, tick_size)
+    print(f"Formatted take profit price: {take_profit_price}, formatted stop loss price: {stop_loss_price}")
 
     try:
         # NOTE: Remove the test part whenever needed
