@@ -43,7 +43,6 @@ def calculate_prices(current_price, take_profit_delta, stop_loss_delta, filter_p
     min_price = filter_params['price']['min_price']
     max_price = filter_params['price']['max_price']
     tick_size = filter_params['price']['price_tick_size']
-    print(f"Tick size: {tick_size}")
 
     # Correctly applying base points (base points divided by 10,000 to convert to percentage)
     take_profit_price = current_price * (1 + take_profit_delta / 10000)

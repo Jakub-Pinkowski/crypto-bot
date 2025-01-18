@@ -1,6 +1,6 @@
 # Initial coin filtering options
-PRICE_CHANGE_THRESHOLD: 25.0  # Minimum percentage price change (absolute)
-PRICE_RANGE_VOLATILITY_THRESHOLD: 0.15  # Minimum range volatility in %
+PRICE_CHANGE_THRESHOLD: 10.0  # Minimum percentage price change (absolute)
+PRICE_RANGE_VOLATILITY_THRESHOLD: 0.03  # Minimum range volatility in %
 
 # Technical indicator parameters
 TREND_INDICATORS:

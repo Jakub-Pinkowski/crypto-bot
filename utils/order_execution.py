@@ -1,3 +1,5 @@
+from decimal import Decimal, ROUND_HALF_UP
+
 def check_coin_balance(wallet_balance, coin):
     for asset in wallet_balance:
         if asset['asset'] == coin:
@@ -5,23 +7,21 @@ def check_coin_balance(wallet_balance, coin):
     raise ValueError(f"{coin} notfound in wallet.")
 
 def round_number(number, step_size):
-    # FIXME: Errors when numbers are too small, for example:
-    # Current price: 3.258e-05, tick size: 1e-08
-    # Take profit price before rounding: 3.48606e-05, stop loss price before rounding: 3.0951e-05
+    # Convert inputs to Decimal for precision
+    number = Decimal(str(number))
+    step_size = Decimal(str(step_size))
 
     # Validate that step_size is positive
-    if step_size < 0:
-        raise ValueError("Step size must be greater than or equal to 0.")
+    if step_size <= 0:
+        raise ValueError("Step size must be greater than 0.")
 
-    # Calculate the number of decimal places in step_size and round the quality accordingly
-    step_size_str = str(step_size)
-    decimal_places = len(step_size_str.split('.')[1]) if '.' in step_size_str else 0
-    number = round(number / step_size) * step_size
+    # Round the number to the nearest step size
+    rounded_number = (number / step_size).quantize(Decimal('1'), rounding=ROUND_HALF_UP) * step_size
 
-    # Round the number to match the precision of step_size, need this to get around floating-point precision
-    number = round(number, decimal_places)
+    # Round again to match the precision of step_size
+    rounded_number = rounded_number.quantize(step_size)
 
-    return number
+    return float(rounded_number)  # Convert back to float if necessary
 
 def extract_filter_parameters(filters):
     # Find relevant filters
