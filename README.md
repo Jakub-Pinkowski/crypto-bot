@@ -84,4 +84,4 @@ crypto_bot/
 
 ## Known issues
 - **Error handling**: Comprehensive error handling for API failures and connection issues is limited
-- **Floating points imprecision**: The bot calculations might experience floating point inaccuracies during financial computations, particularly for trading amounts.
+- **Floating points imprecision**: The bot calculations might experience floating point inaccuracies during financial computations.
