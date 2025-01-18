@@ -17,3 +17,4 @@ if __name__ == "__main__":
     make_transactions(analyzed_coins, wallet_balance, coins_data)
 
     # Track portfolio
+    # TODO: Implement portfolio tracking

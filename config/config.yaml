@@ -1,5 +1,5 @@
 # TODO for the whole project:
-# Optimize the data we download for each coin to speed up the process
+# Optimize the data we download for each coin to reduce the fetching time (main bottleneck)
 # Validate, test and optimize each indicator
 
 
