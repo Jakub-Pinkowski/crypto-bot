@@ -30,7 +30,6 @@ def format_price(price, tick_size):
     # Format the price with the appropriate number of decimal places
     return f"{price:.{tick_size_decimal_places}f}"
 
-
 def extract_filter_parameters(filters):
     # Find relevant filters
     price_filter = next((f for f in filters if f['filterType'] == 'PRICE_FILTER'), None)

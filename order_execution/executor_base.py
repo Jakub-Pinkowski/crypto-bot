@@ -14,7 +14,6 @@ def calculate_quantity(current_price, filter_params, amount_to_use, coin_balance
 
     # Calculate the desired quantity using the amount_to_use and current price
     desired_quantity = amount_to_use / current_price
-
     quantity = round_number(desired_quantity, step_size)
 
     # Validate the calculated quantity
@@ -64,11 +63,13 @@ def validate_trailing_deltas(filter_params):
     take_profit_delta = config['TAKE_PROFIT_DELTA']
     stop_loss_delta = config['STOP_LOSS_DELTA']
 
+    # Get the requirements from the filters
     min_trailing_above_delta = filter_params['trailing_delta']['min_trailing_above_delta']
     max_trailing_above_delta = filter_params['trailing_delta']['max_trailing_above_delta']
     min_trailing_below_delta = filter_params['trailing_delta']['min_trailing_below_delta']
     max_trailing_below_delta = filter_params['trailing_delta']['max_trailing_below_delta']
 
+    # Validate each requirement
     if take_profit_delta < min_trailing_above_delta:
         take_profit_delta = min_trailing_above_delta
 
@@ -134,9 +135,6 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
 
         # TODO: Add tests to this function all all dependent on it
         # TODO: Add a config whether we attach the selling orders or not
-        # TODO: Test the values of price, stopPrice for each function
-        # https://developers.binance.com/docs/binance-spot-api-docs/faqs/trailing-stop-faq#trailing-stop-order-scenarios
-
         # TODO: Take profit and stop loss should cancel each other whenever executed
 
         # Place the take-profit order (take-profit-limit)
