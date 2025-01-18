@@ -41,7 +41,7 @@ def calculate_prices(current_price, take_profit_delta, stop_loss_delta, filter_p
     max_price = filter_params['price']['max_price']
     tick_size = filter_params['price']['price_tick_size']
 
-    # Correctly applying base points (base points divided by 10,000 to convert to percentage)
+    # Calculate initial prices
     take_profit_price = current_price * (1 + take_profit_delta / 10000)
     stop_loss_price = current_price * (1 - stop_loss_delta / 10000)
 
@@ -49,13 +49,21 @@ def calculate_prices(current_price, take_profit_delta, stop_loss_delta, filter_p
     take_profit_price = max(min_price, min(max_price, take_profit_price))
     stop_loss_price = max(min_price, min(max_price, stop_loss_price))
 
-    #
-    print(f"Current price: {current_price}, tick size: {tick_size}")
-    print(f"Take profit price before rounding: {take_profit_price}, stop loss price before rounding: {stop_loss_price}")
+    # Round the prices
+    take_profit_price = round_number(take_profit_price, tick_size)
+    stop_loss_price = round_number(stop_loss_price, tick_size)
+
+    # Format the prices
+    take_profit_price = format_price(take_profit_price, tick_size)
+    stop_loss_price = format_price(stop_loss_price, tick_size)
 
     return take_profit_price, stop_loss_price
 
-def calculate_trailing_deltas(take_profit_delta, stop_loss_delta, filter_params):
+def validate_trailing_deltas(filter_params):
+    # Define the trading delta for the attached selling order
+    take_profit_delta = config['TAKE_PROFIT_DELTA']
+    stop_loss_delta = config['STOP_LOSS_DELTA']
+
     min_trailing_above_delta = filter_params['trailing_delta']['min_trailing_above_delta']
     max_trailing_above_delta = filter_params['trailing_delta']['max_trailing_above_delta']
     min_trailing_below_delta = filter_params['trailing_delta']['min_trailing_below_delta']
@@ -84,14 +92,9 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
     # Extract filters for the trading pair
     filters = coins_data[coin_to_buy]['pair_metadata'][trading_pair]['filters']
     filter_params = extract_filter_parameters(filters)
-    tick_size = filter_params['price']['price_tick_size']
 
     # Get the current price from the market
     current_price = float(client.ticker_price(symbol=trading_pair)['price'])
-
-    # Define the trading delta for the attached selling order
-    desired_take_profit_delta = config['TAKE_PROFIT_DELTA']
-    desired_stop_loss_delta = config['STOP_LOSS_DELTA']
 
     # Calculate, process and validate quantity
     quantity = calculate_quantity(
@@ -101,9 +104,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
     )
 
     # Calculate, process and validate trailing delta
-    take_profit_trailing_delta, stop_loss_trailing_delta = calculate_trailing_deltas(
-        take_profit_delta=desired_take_profit_delta,
-        stop_loss_delta=desired_stop_loss_delta,
+    take_profit_trailing_delta, stop_loss_trailing_delta = validate_trailing_deltas(
         filter_params=filter_params
     )
 
@@ -114,14 +115,6 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         stop_loss_delta=stop_loss_trailing_delta,
         filter_params=filter_params
     )
-
-    take_profit_price = round_number(take_profit_price, tick_size)
-    stop_loss_price = round_number(stop_loss_price, tick_size)
-    print(f"AFTER ROUNDING Tick size {tick_size}, take profit price: {take_profit_price}, stop loss price: {stop_loss_price}")
-
-    take_profit_price = format_price(take_profit_price, tick_size)
-    stop_loss_price = format_price(stop_loss_price, tick_size)
-    print(f"Formatted take profit price: {take_profit_price}, formatted stop loss price: {stop_loss_price}")
 
     try:
         # NOTE: Remove the test part whenever needed
@@ -143,6 +136,8 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
         # TODO: Add a config whether we attach the selling orders or not
         # TODO: Test the values of price, stopPrice for each function
         # https://developers.binance.com/docs/binance-spot-api-docs/faqs/trailing-stop-faq#trailing-stop-order-scenarios
+
+        # TODO: Take profit and stop loss should cancel each other whenever executed
 
         # Place the take-profit order (take-profit-limit)
         take_profit_order = client.new_order_test(
