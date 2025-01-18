@@ -1,9 +1,11 @@
 from unittest.mock import patch
+
 from tests.indicators.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from indicators.indicator_base import apply_indicators
+
 
 def test_apply_indicators_success():
     # Mock coins_data for testing
@@ -115,6 +117,7 @@ def test_apply_indicators_coin_without_candlesticks():
     assert "BTC" in indicators
     assert "ETH" not in indicators
 
+
 def test_apply_indicators_empty_candlestick_data():
     # Mock coins_data where the candlesticks are empty
     coins_data = {
@@ -169,6 +172,7 @@ def test_apply_indicators_multiple_coins():
         assert indicators["BTC"]['trend'] == 'up'
         assert indicators["ETH"]['momentum'] == 50
 
+
 def test_apply_indicators_large_data():
     # Mock coins_data with a large number of coins and candlestick entries
     coins_data = {
@@ -186,6 +190,7 @@ def test_apply_indicators_large_data():
 
     # Assert that the function can handle the large dataset without errors
     assert len(indicators) == 10  # Check that indicators for all coins are returned
+
 
 def test_apply_indicators_non_numeric_values():
     # Mock coins_data where some candlestick values are non-numeric
@@ -206,6 +211,7 @@ def test_apply_indicators_non_numeric_values():
     # Assert that the BTC coin is skipped due to the corrupted data
     assert "BTC" not in indicators
 
+
 def test_apply_indicators_invalid_coin_structure():
     # Mock coins_data with an invalid structure (missing 'candlesticks')
     coins_data = {
@@ -219,4 +225,3 @@ def test_apply_indicators_invalid_coin_structure():
 
     # Assert that BTC is skipped due to invalid structure
     assert "BTC" not in indicators
-

@@ -3,8 +3,10 @@ from utils.file_utils import load_config_values, save_data_to_file
 
 config = load_config_values("BUY_CONDITION", "SELL_CONDITION")
 
+
 def is_coin_in_wallet(coin, wallet):
     return any(entry["asset"] == coin and entry["free"] > 0 for entry in wallet)
+
 
 def rank_coins(indicators):
     rankings = []
@@ -20,6 +22,7 @@ def rank_coins(indicators):
     rankings.sort(key=lambda x: x["score"], reverse=True)
 
     return rankings
+
 
 # TODO: Update tests
 def determine_action(coin, score, wallet_balance):
@@ -46,6 +49,7 @@ def determine_action(coin, score, wallet_balance):
 
     # Default: Don't buy if the coin isn't in the wallet and doesn't qualify for BUY
     return "DO NOT BUY"
+
 
 def analyze_coins(indicators, wallet_balance):
     # Get the sorted rankings

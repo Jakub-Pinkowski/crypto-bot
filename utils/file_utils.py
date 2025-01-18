@@ -1,10 +1,11 @@
 import json
-import yaml
 import os
 from datetime import datetime
 
-def save_data_to_file(data, file_path, file_name):
+import yaml
 
+
+def save_data_to_file(data, file_path, file_name):
     # Define timestamps, filename and folder name
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     filename = f"{file_name}_{timestamp}.json"
@@ -19,6 +20,7 @@ def save_data_to_file(data, file_path, file_name):
     file_path = os.path.join(directory, filename)
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
+
 
 # TODO: Write tests for this function
 def load_data_from_file(file_path, file_name):
@@ -55,6 +57,7 @@ def load_data_from_file(file_path, file_name):
         data = json.load(file)
 
     return data
+
 
 def load_config_values(*keys):
     config_path = os.path.join("config", "config.yaml")

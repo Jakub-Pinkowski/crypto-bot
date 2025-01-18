@@ -1,9 +1,10 @@
 import numpy as np
 
-from indicators.trend_indicators import calculate_trend_indicators, simplify_trend_indicators
 from indicators.momentum_indicators import calculate_momentum_indicators, simplify_momentum_indicators
+from indicators.trend_indicators import calculate_trend_indicators, simplify_trend_indicators
 from indicators.volatility_indicators import calculate_volatility_indicators, simplify_volatility_indicators
 from utils.file_utils import save_data_to_file
+
 
 def calculate_indicators(coins_data):
     # Get indicators
@@ -17,6 +18,7 @@ def calculate_indicators(coins_data):
 
     # Return the cleaned_indicators
     return cleaned_indicators
+
 
 def extract_ohlc_prices(coins_data, coin):
     # Use `get` to avoid KeyError if coin is missing, return empty dictionary if coin not found
@@ -34,6 +36,7 @@ def extract_ohlc_prices(coins_data, coin):
         close_prices.extend([float(ohlcv[4]) for ohlcv in data_list])
 
     return high_prices, low_prices, close_prices
+
 
 def clean_indicators(indicators):
     def convert_value(value):
@@ -55,6 +58,7 @@ def clean_indicators(indicators):
 
     # Clean the entire indicators dictionary
     return {coin: convert_value(data) for coin, data in indicators.items()}
+
 
 def apply_indicators(coins_data):
     indicators = {}
@@ -91,5 +95,3 @@ def apply_indicators(coins_data):
             print(f"Error calculating indicators for {coin}: {e}")
 
     return indicators
-
-

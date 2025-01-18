@@ -1,10 +1,13 @@
-import pandas as pd
 from unittest.mock import patch
+
+import pandas as pd
+
 from tests.indicators.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from indicators.trend_indicators import calculate_ichimoku_cloud
+
 
 def test_ichimoku_with_valid_data():
     # Test with valid highs, lows, and closes
@@ -102,6 +105,7 @@ def test_ichimoku_with_negative_values():
     pd.testing.assert_series_equal(result['senkou_span_b'], senkou_span_b)
     pd.testing.assert_series_equal(result['chikou_span'], chikou_span)
 
+
 def test_ichimoku_with_identical_values():
     # Test with identical highs, lows, and closes
     highs = [50] * 60
@@ -126,6 +130,7 @@ def test_ichimoku_with_identical_values():
     pd.testing.assert_series_equal(result['senkou_span_a'], senkou_span_a)
     pd.testing.assert_series_equal(result['senkou_span_b'], senkou_span_b)
     pd.testing.assert_series_equal(result['chikou_span'], chikou_span)
+
 
 def test_ichimoku_with_single_data_point():
     # Test with a single data point

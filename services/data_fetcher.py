@@ -4,9 +4,11 @@ from utils.file_utils import save_data_to_file, load_config_values
 
 config = load_config_values("PRICE_CHANGE_THRESHOLD", "PRICE_RANGE_VOLATILITY_THRESHOLD")
 
+
 def get_coins_data():
     # Fetch general symbols data
     all_symbols_data = fetch_all_symbols_data()
+    print(f"All symbols data fetched")
 
     # Filter for potential coins
     potential_coins = filter_potential_coins(all_symbols_data)
@@ -26,6 +28,7 @@ def get_coins_data():
     save_data_to_file(coins_data, "market", "coins_data")
 
     return coins_data, wallet_balance
+
 
 def fetch_all_symbols_data():
     # Fetch exchange information (metadata for symbols)
@@ -47,6 +50,7 @@ def fetch_all_symbols_data():
         "prices": trading_prices,  # Filtered price data
         "stats": trading_stats,  # Filtered 24-hour stats
     }
+
 
 def filter_potential_coins(all_symbols_data):
     # Define filter thresholds
@@ -81,6 +85,7 @@ def filter_potential_coins(all_symbols_data):
     potential_coins = {symbol_mapping[symbol]['baseAsset'] for symbol in filtered_symbols}
 
     return potential_coins
+
 
 def fetch_coins_data(all_symbols_data, potential_and_wallet_coins):
     coins_data = {}
@@ -118,7 +123,7 @@ def fetch_coins_data(all_symbols_data, potential_and_wallet_coins):
 
         # Collect data for each pairing
         for pair in trading_pairs:
-            candlestick_data[pair] = client.klines(symbol=pair, interval='1h', limit=24)
+            candlestick_data[pair] = client.klines(symbol=pair, interval='1h', limit=26)
 
         # Store everything in the coin data
         coins_data[coin] = {

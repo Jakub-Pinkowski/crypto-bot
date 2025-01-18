@@ -1,6 +1,7 @@
 from services.binance_auth import client
 from utils.file_utils import save_data_to_file
 
+
 def extract_balance(wallet_info):
     wallet_balance = []
 
@@ -44,6 +45,7 @@ def extract_balance(wallet_info):
         item['percentage'] = round((item['value_in_usdt'] / total_value_in_usdt) * 100, 2)
 
     return wallet_balance
+
 
 def fetch_wallet_balance():
     # Fetch wallet info

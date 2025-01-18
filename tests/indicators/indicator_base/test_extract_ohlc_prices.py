@@ -1,9 +1,11 @@
 from unittest.mock import patch
+
 from tests.indicators.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from indicators.indicator_base import extract_ohlc_prices
+
 
 def test_extract_ohlc_prices_success():
     # Mock coins_data with candlesticks data
@@ -33,6 +35,7 @@ def test_extract_ohlc_prices_success():
     assert high_prices == expected_high_prices
     assert low_prices == expected_low_prices
     assert close_prices == expected_close_prices
+
 
 def test_extract_ohlc_prices_no_candlesticks():
     # Mock coins_data without candlesticks data

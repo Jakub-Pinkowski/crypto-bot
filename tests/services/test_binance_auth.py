@@ -1,7 +1,9 @@
-import pytest
 from unittest.mock import patch
-from binance.spot import Spot
+
+import pytest
 from binance.error import ClientError
+from binance.spot import Spot
+
 
 def test_binance_auth_with_valid_keys():
     # Mock environment variables
@@ -19,6 +21,7 @@ def test_binance_auth_with_valid_keys():
             assert response == {"balances": []}
             mock_account.assert_called_once()
 
+
 def test_binance_auth_with_no_keys():
     # Mock environment variables to return None for both keys
     with patch("os.getenv") as mock_getenv:
@@ -33,6 +36,7 @@ def test_binance_auth_with_no_keys():
 
         # Verify the error occurred due to missing keys
         assert "'NoneType' object has no attribute 'encode'" in str(exc_info.value)
+
 
 def test_binance_auth_with_invalid_keys():
     # Mock environment variables to return invalid keys

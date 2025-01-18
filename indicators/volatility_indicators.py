@@ -4,6 +4,7 @@ from utils.file_utils import load_config_values
 
 config = load_config_values("VOLATILITY_INDICATORS")
 
+
 def calculate_bollinger_bands(prices, window=20, num_std_dev=2):
     if not prices or len(prices) < window:
         return None
@@ -22,6 +23,7 @@ def calculate_bollinger_bands(prices, window=20, num_std_dev=2):
         'upper_band': upper_band,
         'lower_band': lower_band
     }
+
 
 def calculate_atr(highs, lows, closes, window=14):
     if len(highs) < window or len(lows) < window or len(closes) < window:
@@ -46,6 +48,7 @@ def calculate_atr(highs, lows, closes, window=14):
     atr = true_range.rolling(window=window).mean()
 
     return atr
+
 
 def calculate_volatility_indicators(high_prices, low_prices, close_prices):
     indicators = {}

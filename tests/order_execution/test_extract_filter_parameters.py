@@ -1,10 +1,13 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from tests.order_execution.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from order_execution.executor_base import extract_filter_parameters
+
 
 def test_extract_filter_parameters_valid_filters():
     # Test with valid filters

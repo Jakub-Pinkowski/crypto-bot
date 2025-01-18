@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from tests.order_execution.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`

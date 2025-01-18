@@ -1,8 +1,9 @@
 import logging
-from binance.spot import Spot
-from binance.lib.utils import config_logging
-from dotenv import load_dotenv
 import os
+
+from binance.lib.utils import config_logging
+from binance.spot import Spot
+from dotenv import load_dotenv
 
 # Configure logging
 config_logging(logging, logging.INFO)

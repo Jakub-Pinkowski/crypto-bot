@@ -1,3 +1,8 @@
+# TODO for the whole project:
+# Optimize the data we download for each coin to speed up the process
+# Validate, test and optimize each indicator
+
+
 # Initial coin filtering options
 PRICE_CHANGE_THRESHOLD: 10.0  # Minimum percentage price change in %
 PRICE_RANGE_VOLATILITY_THRESHOLD: 0.15  # Minimum range volatility in %
@@ -11,9 +16,6 @@ SELL_CONDITION: 0 # Score needed to sell a coin
 ORDER_VALUE: 10.0 # Order value for the transactions
 TAKE_PROFIT_DELTA: 700 # Take profit in base points
 STOP_LOSS_DELTA: 500 # Stop loss in base points
-
-# TODO for the whole project:
-# Optimize the data we download for each coin to speed up the process
 
 # Technical indicator parameters
 TREND_INDICATORS:

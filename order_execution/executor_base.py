@@ -5,6 +5,7 @@ from utils.order_execution import check_coin_balance, extract_filter_parameters,
 
 config = load_config_values("ORDER_VALUE", "STOP_LOSS_DELTA", "TAKE_PROFIT_DELTA")
 
+
 def calculate_quantity(current_price, filter_params, amount_to_use, coin_balance=None):
     # Extract the variables from filters
     min_qty = filter_params['lot_size']['min_qty']
@@ -34,6 +35,7 @@ def calculate_quantity(current_price, filter_params, amount_to_use, coin_balance
     # If coin_balance is not provided, simply return the calculated quantity
     return quantity
 
+
 def calculate_prices(current_price, take_profit_delta, stop_loss_delta, filter_params):
     # Extract the variables from filters
     min_price = filter_params['price']['min_price']
@@ -57,6 +59,7 @@ def calculate_prices(current_price, take_profit_delta, stop_loss_delta, filter_p
     stop_loss_price = format_price(stop_loss_price, tick_size)
 
     return take_profit_price, stop_loss_price
+
 
 def validate_trailing_deltas(filter_params):
     # Define the trading delta for the attached selling order
@@ -83,6 +86,7 @@ def validate_trailing_deltas(filter_params):
         stop_loss_delta = max_trailing_below_delta
 
     return take_profit_delta, stop_loss_delta
+
 
 def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
     # TODO: Refactor, clean and test all of this once it's working
@@ -146,7 +150,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
             price=take_profit_price,
             stopPrice=take_profit_price,
             trailingDelta=take_profit_trailing_delta,
-            timeInForce = 'GTC'
+            timeInForce='GTC'
         )
         print(f"Take Profit Order Placed: {take_profit_order}")
         save_data_to_file(take_profit_order, "transactions", "take_profit_order")
@@ -169,6 +173,7 @@ def buy_coin_with_usdt(coin_to_buy, amount_to_use, coins_data):
     except Exception as e:
         # Handle and log any errors during the buy transaction
         print(f"An error occurred while trying to buy {coin_to_buy}: {e}")
+
 
 def sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance):
     try:
@@ -209,6 +214,7 @@ def sell_coin_for_usdt(coin_to_sell, amount_to_use, coins_data, wallet_balance):
     except Exception as e:
         # Handle and log any errors during the sell transaction
         print(f"An error occurred while trying to sell {coin_to_sell}: {e}")
+
 
 def make_transactions(coin_analysis, wallet_balance, coins_data):
     # Amount to use for buying a new coin (in USDT)

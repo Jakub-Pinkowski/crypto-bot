@@ -1,5 +1,7 @@
-import pandas as pd
 from unittest.mock import patch
+
+import pandas as pd
+
 from tests.indicators.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`

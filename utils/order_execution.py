@@ -1,10 +1,12 @@
 from decimal import Decimal, ROUND_HALF_UP
 
+
 def check_coin_balance(wallet_balance, coin):
     for asset in wallet_balance:
         if asset['asset'] == coin:
             return float(asset['free'])
     raise ValueError(f"{coin} notfound in wallet.")
+
 
 def round_number(number, step_size):
     # Convert inputs to Decimal for precision
@@ -23,12 +25,14 @@ def round_number(number, step_size):
 
     return float(rounded_number)  # Convert back to float
 
+
 def format_price(price, tick_size):
     # Convert tick_size to string to determine the number of decimal places
     tick_size_decimal_places = abs(int(Decimal(str(tick_size)).as_tuple().exponent))
 
     # Format the price with the appropriate number of decimal places
     return f"{price:.{tick_size_decimal_places}f}"
+
 
 def extract_filter_parameters(filters):
     # Find relevant filters
@@ -71,6 +75,7 @@ def extract_filter_parameters(filters):
     }
 
     return filter_params
+
 
 def validate_quantity(quantity, min_qty, max_qty, current_price, min_notional):
     total_value = quantity * current_price

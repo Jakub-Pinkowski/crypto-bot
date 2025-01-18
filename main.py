@@ -1,7 +1,7 @@
-from services.data_fetcher import get_coins_data
 from indicators.indicator_base import calculate_indicators
-from strategies.base_strategy import analyze_coins
 from order_execution.executor_base import make_transactions
+from services.data_fetcher import get_coins_data
+from strategies.base_strategy import analyze_coins
 
 if __name__ == "__main__":
     # Fetch coins data and wallet balance

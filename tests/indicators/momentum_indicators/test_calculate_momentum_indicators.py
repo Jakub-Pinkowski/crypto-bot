@@ -1,8 +1,10 @@
-import pandas as pd
 from unittest.mock import patch
+
+import pandas as pd
 
 # Mock config data
 from tests.indicators.mock_data import MOCK_CONFIG_VALUES
+
 
 @patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES)
 def test_calculate_momentum_indicators_with_valid_data(mock_load_config):
@@ -11,7 +13,7 @@ def test_calculate_momentum_indicators_with_valid_data(mock_load_config):
 
     # Generate 52 prices for high, low, and close
     high_prices = list(range(50, 102))  # 50 to 101 inclusive
-    low_prices = list(range(40, 92))    # 40 to 91 inclusive
+    low_prices = list(range(40, 92))  # 40 to 91 inclusive
     close_prices = list(range(45, 97))  # 45 to 96 inclusive
 
     # Call the function

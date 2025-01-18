@@ -1,10 +1,13 @@
-import pandas as pd
 from unittest.mock import patch
+
+import pandas as pd
+
 from tests.indicators.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from indicators.volatility_indicators import calculate_atr
+
 
 def test_calculate_atr_with_valid_data():
     # Test with valid data
@@ -29,6 +32,7 @@ def test_calculate_atr_with_valid_data():
     # Validate that the result matches the expected values
     pd.testing.assert_series_equal(result, expected_result)
 
+
 def test_calculate_atr_with_empty_lists():
     # Test with empty lists
     highs = []
@@ -38,6 +42,7 @@ def test_calculate_atr_with_empty_lists():
     result = calculate_atr(highs, lows, closes, window=window)
     assert result is None  # Explicitly check for `None`
 
+
 def test_calculate_atr_with_insufficient_data():
     # Test when the length of inputs is less than the window size
     highs = [20, 22, 24]
@@ -46,6 +51,7 @@ def test_calculate_atr_with_insufficient_data():
     window = 5
     result = calculate_atr(highs, lows, closes, window=window)
     assert result is None  # The function should return `None` due to insufficient data
+
 
 def test_calculate_atr_with_default_window():
     # Test with default window size (14)
@@ -68,6 +74,7 @@ def test_calculate_atr_with_default_window():
 
     # Validate that the result matches the expected values
     pd.testing.assert_series_equal(result, expected_result)
+
 
 def test_calculate_atr_with_window_of_one():
     # Test with a window size of 1
@@ -92,6 +99,7 @@ def test_calculate_atr_with_window_of_one():
     # Validate that the result matches the expected values
     pd.testing.assert_series_equal(result, expected_result)
 
+
 def test_calculate_atr_with_negative_window():
     # Test with a negative window value
     highs = [20, 22, 24, 26, 28, 30]
@@ -103,6 +111,7 @@ def test_calculate_atr_with_negative_window():
         assert False, "Expected an exception for negative window size"
     except ValueError as e:
         assert str(e) == "window must be an integer >= 1"
+
 
 def test_calculate_atr_with_zero_window():
     # Test with a zero window value

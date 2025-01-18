@@ -1,10 +1,13 @@
-import numpy as np
 from unittest.mock import patch
+
+import numpy as np
+
 from tests.indicators.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from indicators.indicator_base import clean_indicators
+
 
 def test_clean_indicators_converts_float64():
     test_input = {'value': np.float64(53.325714285714284)}
@@ -14,6 +17,7 @@ def test_clean_indicators_converts_float64():
 
     assert result == expected_output
 
+
 def test_clean_indicators_converts_float32():
     test_input = {'value': np.float32(53.325714285714284)}
     expected_output = {'value': 53.3257}
@@ -21,6 +25,7 @@ def test_clean_indicators_converts_float32():
     result = clean_indicators(test_input)
 
     assert result == expected_output
+
 
 def test_clean_indicators_converts_int64():
     test_input = {'value': np.int64(100)}
@@ -30,6 +35,7 @@ def test_clean_indicators_converts_int64():
 
     assert result == expected_output
 
+
 def test_clean_indicators_converts_int32():
     test_input = {'value': np.int32(100)}
     expected_output = {'value': 100}
@@ -37,6 +43,7 @@ def test_clean_indicators_converts_int32():
     result = clean_indicators(test_input)
 
     assert result == expected_output
+
 
 def test_clean_indicators_converts_bool_True():
     test_input = {'value': np.bool_(True)}
@@ -46,6 +53,7 @@ def test_clean_indicators_converts_bool_True():
 
     assert result == expected_output
 
+
 def test_clean_indicators_converts_bool_False():
     test_input = {'value': np.bool_(False)}
     expected_output = {'value': False}
@@ -53,6 +61,7 @@ def test_clean_indicators_converts_bool_False():
     result = clean_indicators(test_input)
 
     assert result == expected_output
+
 
 def test_clean_indicators_converts_nested_dict():
     test_input = {
@@ -72,6 +81,7 @@ def test_clean_indicators_converts_nested_dict():
 
     assert result == expected_output
 
+
 def test_clean_indicators_converts_list():
     test_input = {'values': [np.float64(1.2345), np.int64(100)]}
     expected_output = {'values': [1.2345, 100]}
@@ -80,6 +90,7 @@ def test_clean_indicators_converts_list():
 
     assert result == expected_output
 
+
 def test_clean_indicators_converts_float():
     test_input = {'value': 12.34567}
     expected_output = {'value': 12.3457}
@@ -87,6 +98,7 @@ def test_clean_indicators_converts_float():
     result = clean_indicators(test_input)
 
     assert result == expected_output
+
 
 def test_clean_indicators_no_conversion_needed():
     test_input = {'value': 'string'}

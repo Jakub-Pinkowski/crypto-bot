@@ -1,4 +1,5 @@
 import pandas as pd
+
 from utils.file_utils import load_config_values
 
 config = load_config_values("MOMENTUM_INDICATORS")
@@ -33,6 +34,7 @@ def calculate_rsi(prices, window=14):
 
     return rsi
 
+
 def calculate_stochastic_oscillator(highs, lows, closes, window=14, smooth_window=3):
     if len(highs) < window or len(lows) < window or len(closes) < window:
         return None
@@ -51,6 +53,7 @@ def calculate_stochastic_oscillator(highs, lows, closes, window=14, smooth_windo
         '%D': percent_d
     }
 
+
 def calculate_williams_r(highs, lows, closes, window=14):
     if len(highs) < window or len(lows) < window or len(closes) < window:
         return None
@@ -64,6 +67,7 @@ def calculate_williams_r(highs, lows, closes, window=14):
     williams_r = ((highest_high - pd.Series(closes)) / (highest_high - lowest_low)) * -100
 
     return williams_r
+
 
 def calculate_cci(highs, lows, closes, window=20):
     if len(highs) < window or len(lows) < window or len(closes) < window:
@@ -88,6 +92,7 @@ def calculate_cci(highs, lows, closes, window=20):
     cci = (typical_price - tp_sma) / (0.015 * mean_deviation)
 
     return cci
+
 
 def calculate_momentum_indicators(high_prices, low_prices, close_prices):
     indicators = {}

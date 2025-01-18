@@ -1,7 +1,9 @@
 import pandas as pd
+
 from utils.file_utils import load_config_values
 
 config = load_config_values("TREND_INDICATORS")
+
 
 def calculate_sma(prices, window=14):
     if not prices:
@@ -11,9 +13,9 @@ def calculate_sma(prices, window=14):
     if not isinstance(window, int) or window < 1:
         raise ValueError("window must be an integer >= 1")
 
-
     prices_series = pd.Series(prices)
     return prices_series.rolling(window=window).mean()
+
 
 def calculate_ema(prices, window=14):
     if not prices:
@@ -25,6 +27,7 @@ def calculate_ema(prices, window=14):
 
     prices_series = pd.Series(prices)
     return prices_series.ewm(span=window, adjust=False).mean()
+
 
 def calculate_macd(prices, short_window=12, long_window=26, signal_window=9):
     if not prices or len(prices) < long_window:
@@ -40,6 +43,7 @@ def calculate_macd(prices, short_window=12, long_window=26, signal_window=9):
         'signal_line': signal_line,
         'histogram': histogram
     }
+
 
 def calculate_ichimoku_cloud(highs, lows, closes, tenkan_window=9, kijun_window=26, senkou_b_window=52, senkou_shift=26):
     if len(highs) < max(tenkan_window, kijun_window, senkou_b_window):
@@ -75,6 +79,7 @@ def calculate_ichimoku_cloud(highs, lows, closes, tenkan_window=9, kijun_window=
         'chikou_span': chikou_span
     }
 
+
 def calculate_trend_indicators(high_prices, low_prices, close_prices):
     indicators = {}
     try:
@@ -103,12 +108,14 @@ def calculate_trend_indicators(high_prices, low_prices, close_prices):
         senkou_b_window = ichimoku_config['SENKOU_B_WINDOW']
         senkou_shift = ichimoku_config['SENKOU_SHIFT']
         if len(high_prices) >= max(tenkan_window, kijun_window, senkou_b_window):
-            indicators['Ichimoku'] = calculate_ichimoku_cloud(high_prices, low_prices, close_prices, tenkan_window, kijun_window, senkou_b_window, senkou_shift)
+            indicators['Ichimoku'] = calculate_ichimoku_cloud(high_prices, low_prices, close_prices, tenkan_window, kijun_window,
+                                                              senkou_b_window, senkou_shift)
 
     except Exception as e:
         print(f"Error in calculating basic indicators: {e}")
 
     return indicators
+
 
 def simplify_trend_indicators(trend_indicators, close_prices):
     simplified = {}

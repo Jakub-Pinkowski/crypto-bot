@@ -1,8 +1,10 @@
-import pytest
-from unittest.mock import patch, mock_open, MagicMock
-import os
 import json
+import os
+from unittest.mock import patch, mock_open, MagicMock
+
+import pytest
 import yaml
+
 from utils.file_utils import save_data_to_file, load_config_values
 
 
@@ -25,6 +27,7 @@ def test_save_data_to_file_creates_directory():
         expected_path = os.path.join(base_dir, "data", test_file_path, "2023-10-31")
 
         mock_makedirs.assert_called_once_with(expected_path, exist_ok=True)
+
 
 def test_save_data_to_file_creates_correct_file():
     test_data = {"key": "value"}
@@ -60,6 +63,7 @@ def test_save_data_to_file_creates_correct_file():
         written_content = "".join(call.args[0] for call in mock_file_handle.write.call_args_list)
         assert written_content == json.dumps(test_data, indent=4)
 
+
 def test_load_config_values_success():
     config = {
         "key1": "value1",
@@ -76,11 +80,13 @@ def test_load_config_values_success():
         assert result == {"key1": "value1", "key2": "value2"}
         mock_file.assert_called_once_with(os.path.join("config", "config.yaml"), "r")
 
+
 def test_load_config_values_file_not_found():
     # Mock the config file does not exist
     with patch("os.path.exists", return_value=False):
         with pytest.raises(FileNotFoundError, match="Config file not found at 'config/config.yaml'"):
             load_config_values("key1")
+
 
 def test_load_config_values_parse_error():
     # Mock a malformed YAML file
@@ -88,6 +94,7 @@ def test_load_config_values_parse_error():
             patch("os.path.exists", return_value=True):
         with pytest.raises(yaml.YAMLError, match="Error while parsing the config file:"):
             load_config_values("key1")
+
 
 def test_load_config_values_missing_key():
     config = {

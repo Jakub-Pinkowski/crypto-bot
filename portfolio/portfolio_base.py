@@ -2,6 +2,7 @@ import csv
 from services.binance_auth import client
 from utils.file_utils import save_data_to_file, load_data_from_file
 
+
 # NOTE: The whole file is not being used yet
 def get_wallet_info():
     # Fetch wallet info
@@ -50,6 +51,7 @@ def get_wallet_info():
 
     return wallet_balance, total_value_in_usdt
 
+
 def process_changes(current_data, previous_data=None):
     if not previous_data:
         # If no previous data, initialize changes to None
@@ -84,9 +86,11 @@ def process_changes(current_data, previous_data=None):
 
     return current_data
 
+
 def export_to_csv(data, filename="wallet_data.csv"):
     # Define the CSV file's header
-    headers = ['Asset', 'Free', 'Locked', 'Price in USDT', 'Value in USDT', 'Percentage', 'Value Change', 'Volume Change', 'Value Change Percentage']
+    headers = ['Asset', 'Free', 'Locked', 'Price in USDT', 'Value in USDT', 'Percentage', 'Value Change', 'Volume Change',
+               'Value Change Percentage']
 
     with open(filename, mode='w', newline='') as file:
         writer = csv.writer(file)
@@ -108,6 +112,7 @@ def export_to_csv(data, filename="wallet_data.csv"):
             ])
 
     print(f"Data successfully exported to {filename}")
+
 
 def main():
     # Load previous data

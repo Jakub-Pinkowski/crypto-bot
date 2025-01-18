@@ -1,8 +1,10 @@
-import pandas as pd
 from unittest.mock import patch
+
+import pandas as pd
 
 # Mock config data
 from tests.indicators.mock_data import MOCK_CONFIG_VALUES
+
 
 @patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES)
 def test_calculate_volatility_indicators_with_valid_data(mock_load_config):
@@ -11,7 +13,7 @@ def test_calculate_volatility_indicators_with_valid_data(mock_load_config):
 
     # Generate 52 prices for high, low, and close
     high_prices = list(range(50, 102))  # 50 to 101 inclusive
-    low_prices = list(range(40, 92))    # 40 to 91 inclusive
+    low_prices = list(range(40, 92))  # 40 to 91 inclusive
     close_prices = list(range(45, 97))  # 45 to 96 inclusive
 
     # Call the function to calculate volatility indicators
@@ -27,6 +29,7 @@ def test_calculate_volatility_indicators_with_valid_data(mock_load_config):
     assert isinstance(indicators['BollingerBands']['lower_band'], pd.Series)
     assert isinstance(indicators['ATR'], pd.Series)
 
+
 @patch("utils.file_utils.load_config_values", return_value={})
 def test_calculate_volatility_indicators_with_invalid_config(mock_load_config):
     # Test with missing or invalid configuration
@@ -41,6 +44,7 @@ def test_calculate_volatility_indicators_with_invalid_config(mock_load_config):
 
     # Check if the function gracefully handles missing config values
     assert indicators == {}  # Expected output: empty dictionary
+
 
 @patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES)
 def test_calculate_volatility_indicators_with_small_data(mock_load_config):
@@ -59,6 +63,7 @@ def test_calculate_volatility_indicators_with_small_data(mock_load_config):
     assert 'BollingerBands' not in indicators  # Not enough data points for BollingerBands
     assert 'ATR' not in indicators  # Not enough data points for ATR
 
+
 @patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES)
 def test_calculate_volatility_indicators_with_one_price(mock_load_config):
     # Test with only one price point
@@ -74,6 +79,7 @@ def test_calculate_volatility_indicators_with_one_price(mock_load_config):
     # Check if the function can handle single data point input
     assert 'BollingerBands' not in indicators
     assert 'ATR' not in indicators
+
 
 @patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES)
 def test_calculate_volatility_indicators_with_empty_data(mock_load_config):

@@ -1,10 +1,13 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from tests.order_execution.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from order_execution.executor_base import check_coin_balance
+
 
 def test_check_coin_balance_valid_coin():
     wallet_balance = [
@@ -37,6 +40,7 @@ def test_check_coin_balance_empty_wallet():
     wallet_balance = []
     with pytest.raises(ValueError, match="BTC notfound in wallet."):
         check_coin_balance(wallet_balance, 'BTC')
+
 
 def test_check_coin_balance_zero_balance():
     wallet_balance = [

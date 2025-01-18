@@ -1,10 +1,13 @@
-import pandas as pd
 from unittest.mock import patch
+
+import pandas as pd
+
 from tests.indicators.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from indicators.momentum_indicators import calculate_williams_r
+
 
 def test_calculate_williams_r_with_valid_data():
     # Test with a valid list of highs, lows, and closes

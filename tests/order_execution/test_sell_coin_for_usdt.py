@@ -1,16 +1,20 @@
-import pytest
 from unittest.mock import patch, MagicMock
+
+import pytest
+
 from tests.order_execution.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from order_execution.executor_base import sell_coin_for_usdt
 
+
 # Mock the client and other dependencies
 class MockClient:
     @staticmethod
     def new_order_test(symbol, side, type, quantity):
         return {"symbol": symbol, "side": side, "type": type, "quantity": quantity}
+
 
 @pytest.fixture
 def mock_client():

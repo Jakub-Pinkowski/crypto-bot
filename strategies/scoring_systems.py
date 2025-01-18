@@ -29,17 +29,20 @@ def scoring_system_1(indicators):
     raw_score = rsi_score + sma_score_weighted + macd_score
     return max(-100, min(100, raw_score / 1.5))
 
+
 def scoring_system_2(indicators):
     rsi_score = indicators['momentum']['RSI'] * 1.7
     sma_score_weighted = indicators['trend']['SMA'] * -2.5
     raw_score = rsi_score + sma_score_weighted
     return max(-100, min(100, raw_score / 2))
 
+
 def scoring_system_3(indicators):
     sma_score_weighted = indicators['trend']['SMA'] * -3.5
     rsi_score = indicators['momentum']['RSI'] * 0.8
     raw_score = sma_score_weighted + rsi_score
     return max(-100, min(100, raw_score / 2))
+
 
 def scoring_system_4(indicators):
     atr_score = indicators['volatility']['ATR'] * -0.8
@@ -49,6 +52,7 @@ def scoring_system_4(indicators):
     raw_score = atr_score + sma_score_weighted + above_sma_score + bollinger_width_score
     return max(-100, min(100, raw_score / 2))
 
+
 def scoring_system_5(indicators):
     ema_score = indicators['trend']['EMA'] * (0.8 if indicators['trend']['above_SMA'] else -0.8)
     stochastic_score = 8 if indicators['momentum']['Stochastic_signal'] == "bullish" else -8
@@ -57,12 +61,14 @@ def scoring_system_5(indicators):
     raw_score = ema_score + momentum_score + volatility_score
     return max(-100, min(100, raw_score / 1.8))
 
+
 def scoring_system_6(indicators):
     sma_deviation_score = -abs(indicators['trend']['SMA']) * 1.8
     bollinger_deviation_score = -abs(indicators['volatility']['Bollinger_width']) * 2.7
     rsi_score = indicators['momentum']['RSI'] * 1.3
     raw_score = sma_deviation_score + bollinger_deviation_score + rsi_score
     return max(-100, min(100, raw_score / 1.8))
+
 
 def scoring_system_7(indicators):
     rsi_score = indicators['momentum']['RSI'] * 1.8
@@ -82,6 +88,7 @@ def scoring_system_8(indicators):
     raw_score = macd_trend_score + macd_histogram_score + rsi_score + volatility_score
     return max(-100, min(100, raw_score / 2))
 
+
 def scoring_system_9(indicators):
     stochastic_score = (indicators['momentum']['Stochastic_%K'] - indicators['momentum']['Stochastic_%D']) * 2
     ema_score = indicators['trend']['EMA'] * (1.2 if indicators['trend']['above_SMA'] else -1.2)
@@ -89,6 +96,7 @@ def scoring_system_9(indicators):
     rsi_score = max(0, (indicators['momentum']['RSI'] - 30)) * 1.1
     raw_score = stochastic_score + ema_score + stochastic_signal_score + rsi_score
     return max(-100, min(100, raw_score / 2.5))
+
 
 def scoring_system_10(indicators):
     bollinger_position_score = 10 if indicators['volatility']['close_above_upper'] else (

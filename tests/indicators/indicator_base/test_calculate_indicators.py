@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from tests.indicators.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`
@@ -27,6 +29,7 @@ cleaned_indicators_mock = {
     }
 }
 
+
 def test_calculate_indicators_calls_apply_indicators():
     with patch("indicators.indicator_base.apply_indicators") as mock_apply_indicators:
         # Mock the return value of apply_indicators
@@ -48,6 +51,7 @@ def test_calculate_indicators_calls_clean_indicators():
 
         # Assert that clean_indicators was called with the output from apply_indicators
         mock_clean_indicators.assert_called_once_with(cleaned_indicators_mock)
+
 
 # TODO: Fix this one test
 def test_calculate_indicators_calls_save_data_to_file():

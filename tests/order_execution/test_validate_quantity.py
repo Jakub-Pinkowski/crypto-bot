@@ -1,10 +1,13 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from tests.order_execution.mock_data import MOCK_CONFIG_VALUES
 
 # Mock `load_config_values`
 with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUES):
     from order_execution.executor_base import validate_quantity
+
 
 def test_validate_quantity_valid():
     # Test when quantity is valid and within the allowed range

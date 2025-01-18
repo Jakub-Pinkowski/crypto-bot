@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from tests.services.mock_data import (
     MOCK_CONFIG_VALUES,
     MOCK_EXCHANGE_INFO,
@@ -20,11 +22,13 @@ with patch("utils.file_utils.load_config_values", return_value=MOCK_CONFIG_VALUE
         get_coins_data,
     )
 
+
 @pytest.fixture
 def mock_client():
     """Fixture to mock the 'client' object."""
     with patch("services.data_fetcher.client") as mock_client:
         yield mock_client
+
 
 def test_fetch_all_symbols_data(mock_client):
     # Assign global mocks
@@ -56,6 +60,7 @@ def test_fetch_all_symbols_data(mock_client):
         {"symbol": "ETHUSDT", "priceChangePercent": "3"},
     ]
 
+
 def test_filter_potential_coins():
     # Call the function under test
     result = filter_potential_coins(MOCK_ALL_SYMBOLS_DATA)
@@ -65,6 +70,7 @@ def test_filter_potential_coins():
 
     # Assertions
     assert result == expected_result, f"Expected {expected_result}, but got {result}"
+
 
 def test_fetch_coins_data(mock_client):
     # Assign global mocks
@@ -104,6 +110,7 @@ def test_fetch_coins_data(mock_client):
     assert eth_market_stat["lowPrice"] == "4000"
 
     assert eth_data["candlesticks"]["ETHUSDT"] == MOCK_CANDLESTICKS
+
 
 @patch("services.data_fetcher.fetch_all_symbols_data", return_value=MOCK_ALL_SYMBOLS_DATA)
 @patch("services.data_fetcher.filter_potential_coins", return_value={"BTC"})
