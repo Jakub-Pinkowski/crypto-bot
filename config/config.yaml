@@ -1,6 +1,7 @@
 # TODO for the whole project:
 # Optimize the data we download for each coin to reduce the fetching time (main bottleneck)
 # Validate, test and optimize each indicator
+# Add portfolio tracking with file exports to Google Sheets
 
 
 # Initial coin filtering options
